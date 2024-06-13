@@ -1,15 +1,17 @@
 import React, { Component } from 'react'
+import { generateShuffledDeck } from '../../utils';
 
 export default class Game extends Component {
 
-  startGame = () => {
-    console.log('start');
-  }
+  handleGenerateDeck = () => {
+    const shuffledDeck = generateShuffledDeck();
+    console.log(shuffledDeck);
+  };
 
   render() {
     return (
       <div>
-        <button onClick={this.startGame}>START</button>
+        <button onClick={this.handleGenerateDeck}>START</button>
       </div>
     )
   }
