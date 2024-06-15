@@ -1,9 +1,9 @@
 import './Card.css'
 
-function Card({ key, image, card }) {
+function Card({ key, image, card, onClick }) {
 
   function selectCard() {
-    console.log(card);
+    onClick(card);
   }
 
   return (
