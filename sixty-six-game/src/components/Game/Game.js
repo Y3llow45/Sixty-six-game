@@ -45,6 +45,7 @@ export default class Game extends Component {
   };
 
   handleCardClick = (cardIndex) => {                               /// PLAYER
+    console.log(`HANDLE CARD CLICK: ${cardIndex}`)
     this.setState(() => ({
       playerSelection: cardIndex
     }), () => {
@@ -58,7 +59,9 @@ export default class Game extends Component {
     });
   };
 
-  opponentTurn = () => {                                                               //OPPONENT
+  opponentTurn = () => {
+    console.log(`PLAYER SELECTION IS: ${this.state.playerSelection}`);
+    console.log(typeof (this.state.playerSelection));                                //OPPONENT
     const randomIndex = Math.floor(Math.random() * this.state.opponent.length);
     this.setState(() => ({
       opponentSelection: this.state.opponent[randomIndex]
@@ -79,17 +82,32 @@ export default class Game extends Component {
     console.log(this.state);
     if (player.suit == opponent.suit) {
       if (player.points > opponent.points) {
-        console.log(`player wins`);
+        setTimeout(() => {
+          this.clearSelection();
+        }, 250000)
       } else {
-        console.log(`opponent wins`);
+        setTimeout(() => {
+          this.clearSelection();
+        }, 250000)
       }
     } else {
       if (this.state.isPlayerFirst) {
-        console.log(`player wins`);
+        setTimeout(() => {
+          this.clearSelection();
+        }, 250000)
       } else {
-        console.log(`opponent wins`);
+        setTimeout(() => {
+          this.clearSelection();
+        }, 250000)
       }
     }
+  }
+
+  clearSelection = () => {
+    this.setState({
+      opponentSelection: '',
+      playerSelection: ''
+    })
   }
 
   render() {
@@ -102,13 +120,14 @@ export default class Game extends Component {
           })}
         </div>
         <div className='center'>
-
+          {this.state.opponentSelection === '' ? null : <img className='imgMargin' src={`/cards/${this.state.cardMapping[this.state.opponentSelection].image}`} />}
+          {this.state.playerSelection === '' ? null : <img className='imgMargin' src={`/cards/${this.state.cardMapping[this.state.playerSelection].image}`} />}
         </div>
         <div className='player'>
           {this.state.player.map(cardIndex => {
-            const card = this.state.cardMapping[cardIndex - 1];
-            //console.log(card.image, card.card, cardIndex);
-            return <Card key={cardIndex - 1} image={card.image} card={card.card} onClick={() => this.handleCardClick(cardIndex - 1)} />;
+            const card = this.state.cardMapping[cardIndex];
+            console.log(card.image, card.card, cardIndex);
+            return <Card key={cardIndex} image={card.image} card={card.card} onClick={() => this.handleCardClick(cardIndex)} />;
           })}
         </div>
       </div>
