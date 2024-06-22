@@ -37,7 +37,6 @@ export default class Game extends Component {
     }, () => {
       //console.log(`OP: ${this.state.opponent}, PL: ${this.state.player}, CE: ${this.state.center}, DECK: ${this.state.deck}`)
       //this.startGame();
-      console.log(this.state.trumpSuit);
       if (!this.state.isPlayerFirst) {
         this.opponentTurn();
       }
@@ -46,27 +45,37 @@ export default class Game extends Component {
 
   handleCardClick = (cardIndex) => {                               /// PLAYER
     console.log(`HANDLE CARD CLICK: ${cardIndex}`)
+    console.log(this.state.player)
     this.setState(() => ({
       playerSelection: cardIndex
     }), () => {
       console.log(this.state.playerSelection);
+      this.removeCard(cardIndex);
+    });
+  };
+
+  removeCard = (cardIndex) => {
+    let updated = this.state.player.filter(num => num !== cardIndex);
+    this.setState(() => ({
+      player: updated
+    }), () => {
       if (this.state.isPlayerFirst) {
         this.opponentTurn();
       }
       else {
         this.compareCards();
       }
-    });
-  };
+    })
+  }
 
   opponentTurn = () => {
-    console.log(`PLAYER SELECTION IS: ${this.state.playerSelection}`);
-    console.log(typeof (this.state.playerSelection));                                //OPPONENT
     const randomIndex = Math.floor(Math.random() * this.state.opponent.length);
+    let updated = this.state.opponent.filter(num => num !== randomIndex);
+    console.log(`opponent ${updated}`);
     this.setState(() => ({
-      opponentSelection: this.state.opponent[randomIndex]
+      opponentSelection: this.state.opponent[randomIndex],
+      opponent: updated
     }), () => {
-      console.log(this.state.opponentSelection);
       if (this.state.isPlayerFirst) {
         this.compareCards();
       }
@@ -75,40 +84,29 @@ export default class Game extends Component {
   };
 
   compareCards = () => {
-    console.log(this.state.opponentSelection, this.state.playerSelection);
     let opponent = this.state.cardMapping[this.state.opponentSelection];
     let player = this.state.cardMapping[this.state.playerSelection];
-    console.log(opponent, player);
-    console.log(this.state);
-    if (player.suit == opponent.suit) {
+    if (player.suit === opponent.suit) {
       if (player.points > opponent.points) {
-        setTimeout(() => {
-          this.clearSelection();
-        }, 250000)
+        console.log('player wins')
       } else {
-        setTimeout(() => {
-          this.clearSelection();
-        }, 250000)
+        console.log('opponent wins')
       }
     } else {
       if (this.state.isPlayerFirst) {
-        setTimeout(() => {
-          this.clearSelection();
-        }, 250000)
+        console.log('player wins')
       } else {
-        setTimeout(() => {
-          this.clearSelection();
-        }, 250000)
+        console.log('opponent wins')
       }
     }
   }
 
-  clearSelection = () => {
+  /*clearSelection = () => {
     this.setState({
       opponentSelection: '',
       playerSelection: ''
     })
-  }
+  }*/
 
   render() {
     return (
@@ -120,13 +118,12 @@ export default class Game extends Component {
           })}
         </div>
         <div className='center'>
-          {this.state.opponentSelection === '' ? null : <img className='imgMargin' src={`/cards/${this.state.cardMapping[this.state.opponentSelection].image}`} />}
-          {this.state.playerSelection === '' ? null : <img className='imgMargin' src={`/cards/${this.state.cardMapping[this.state.playerSelection].image}`} />}
+          {this.state.opponentSelection === '' ? null : <img className='imgMargin' alt='card' src={`/cards/${this.state.cardMapping[this.state.opponentSelection].image}`} />}
+          {this.state.playerSelection === '' ? null : <img className='imgMargin' alt='card' src={`/cards/${this.state.cardMapping[this.state.playerSelection].image}`} />}
         </div>
         <div className='player'>
           {this.state.player.map(cardIndex => {
             const card = this.state.cardMapping[cardIndex];
-            console.log(card.image, card.card, cardIndex);
             return <Card key={cardIndex} image={card.image} card={card.card} onClick={() => this.handleCardClick(cardIndex)} />;
           })}
         </div>
