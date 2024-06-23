@@ -31,3 +31,11 @@
   margin-top: 60px;
   margin-bottom: 60px;
 }
+
+.trumpSuit {
+  transform: rotate(90deg);
+  margin-left: 22px;
+  margin-right: 60px;
+  margin-top: 60px;
+  margin-bottom: 61px;
+}

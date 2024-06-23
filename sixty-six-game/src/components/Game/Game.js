@@ -11,7 +11,7 @@ export default class Game extends Component {
       deck: [],           // cards to draw
       opponent: [],       // opponent's cards
       player: [],         // player's cards
-      trumpSuit: '',
+      trump: '',
       opponentHands: [],  // hands won by opponent
       playerHands: [],    // hands won by player
       opponentSelection: '',
@@ -32,7 +32,7 @@ export default class Game extends Component {
     this.setState({
       opponent: shuffledDeck.slice(0, 6),
       player: shuffledDeck.slice(6, 12),
-      trumpSuit: this.state.cardMapping[shuffledDeck[12]].suit,
+      trump: this.state.cardMapping[shuffledDeck[12]],
       deck: shuffledDeck.slice(13)
     }, () => {
       //console.log(`OP: ${this.state.opponent}, PL: ${this.state.player}, CE: ${this.state.center}, DECK: ${this.state.deck}`)
@@ -70,10 +70,11 @@ export default class Game extends Component {
 
   opponentTurn = () => {
     const randomIndex = Math.floor(Math.random() * this.state.opponent.length);
-    let updated = this.state.opponent.filter(num => num !== randomIndex);
+    const selectedCard = this.state.opponent[randomIndex];
+    let updated = this.state.opponent.filter(num => num !== selectedCard);
     console.log(`opponent ${updated}`);
     this.setState(() => ({
-      opponentSelection: this.state.opponent[randomIndex],
+      opponentSelection: selectedCard,
       opponent: updated
     }), () => {
       if (this.state.isPlayerFirst) {
@@ -118,6 +119,7 @@ export default class Game extends Component {
           })}
         </div>
         <div className='center'>
+          {this.state.player.length > 0 ? <img className='trumpSuit' src={`/cards/${this.state.trump.image}`}></img> : null}
           {this.state.opponentSelection === '' ? null : <img className='imgMargin' alt='card' src={`/cards/${this.state.cardMapping[this.state.opponentSelection].image}`} />}
           {this.state.playerSelection === '' ? null : <img className='imgMargin' alt='card' src={`/cards/${this.state.cardMapping[this.state.playerSelection].image}`} />}
         </div>
