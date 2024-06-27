@@ -39,9 +39,11 @@ export default class Game extends Component {
       opponent: shuffledDeck.slice(0, 6),
       player: shuffledDeck.slice(6, 12),
       trump: this.state.cardMapping[shuffledDeck[12]],
-      deck: shuffledDeck.slice(13)
+      deck: [...shuffledDeck.slice(13), shuffledDeck[12]],
+      opponentHands: 0,
+      playerHands: 0
     }, () => {
-      //console.log(`OP: ${this.state.opponent}, PL: ${this.state.player}, CE: ${this.state.center}, DECK: ${this.state.deck}`)
+      console.log(`OP: ${this.state.opponent}, PL: ${this.state.player}, CE: ${this.state.center}, DECK: ${this.state.deck}`)
       //this.startGame();
       if (!this.state.isPlayerFirst) {
         this.opponentTurn();
@@ -88,14 +90,22 @@ export default class Game extends Component {
   };
 
   clearSelection = (option, player, opponent) => {
-    this.setState(() => ({
-      opponentSelection: '',
-      playerSelection: '',
-      isPlayerFirst: option,
-      playerHands: this.state.playerHands + player,
-      opponentHands: this.state.opponentHands + opponent
-    }), () => {
-      console.log(`Points: ${this.state.playerHands} vs ${this.state.opponentHands}`)
+    console.log(this.state.opponent, this.state.player, this.state.deck[0], typeof (this.state.deck[0]))
+    this.setState(() => {
+      const player = this.state.deck.length > 1 ? [...this.state.player, this.state.deck[0]] : this.state.player;
+      const opponent = this.state.deck.length > 1 ? [...this.state.opponent, this.state.deck[1]] : this.state.opponent;
+      return {
+        opponentSelection: '',
+        playerSelection: '',
+        isPlayerFirst: option,
+        playerHands: this.state.playerHands + player,
+        opponentHands: this.state.opponentHands + opponent,
+        player: player,
+        opponent: opponent,
+        deck: this.state.deck.slice(2)
+      }
+    }, () => {
+      console.log(`Points: ${this.state.playerHands} vs ${this.state.opponentHands} and deck: ${this.state.deck}`)
       if (!this.state.isPlayerFirst && this.state.opponent.length > 0) {
         this.opponentTurn();
       }
@@ -110,34 +120,34 @@ export default class Game extends Component {
         console.log('player wins')
         setTimeout(() => {
           this.clearSelection(true, player.points + opponent.points, 0);
-        }, 2500)
+        }, 500)
       } else {
         console.log('opponent wins')
         setTimeout(() => {
           this.clearSelection(false, 0, player.points + opponent.points);
-        }, 2500)
+        }, 500)
       }
     } else if (player.suit === this.state.trump.suit) {
       console.log('player wins')
       setTimeout(() => {
         this.clearSelection(true, player.points + opponent.points, 0);
-      }, 2500)
+      }, 500)
     } else if (opponent.suit === this.state.trump.suit) {
       console.log('opponent wins')
       setTimeout(() => {
         this.clearSelection(false, 0, player.points + opponent.points);
-      }, 2500)
+      }, 500)
     } else {
       if (this.state.isPlayerFirst) {
         console.log('player wins')
         setTimeout(() => {
           this.clearSelection(true, player.points + opponent.points, 0);
-        }, 2500)
+        }, 500)
       } else {
         console.log('opponent wins')
         setTimeout(() => {
           this.clearSelection(false, 0, player.points + opponent.points);
-        }, 2500)
+        }, 500)
       }
     }
   }
@@ -154,17 +164,15 @@ export default class Game extends Component {
       <div className='game'>
         <button onClick={this.handleGenerateDeck} className='btnStart'>START</button>
         <div className='opponent'>
-          {this.state.opponent.map(a => {
-            return <Card key={a} image={'back.png'} card={'back'} />;
-          })}
+          {this.state.opponent ? this.state.opponent.map(a => {
+            return <Card key={a} image={'back.png'} card={'back'} />
+          }) : null}
         </div>
         <div className='center'>
           {this.state.player.length > 0 ? <img className='otherCards' src={`/cards/back.png`}></img> : null}
           {this.state.player.length > 0 ? <img className='trumpSuit' src={`/cards/${this.state.trump.image}`}></img> : null}
-
           {this.state.opponentSelection === '' ? null : <img className='imgMargin' alt='card' src={`/cards/${this.state.cardMapping[this.state.opponentSelection].image}`} />}
           {this.state.playerSelection === '' ? null : <img className='imgMargin' alt='card' src={`/cards/${this.state.cardMapping[this.state.playerSelection].image}`} />}
-
           {this.state.playerHands > 0 &&
             this.state.isPlayerFirst == true &&
             this.state.player.includes(this.state.specialNine[this.state.trump.suit]) ?
