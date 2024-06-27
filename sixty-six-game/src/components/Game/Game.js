@@ -12,8 +12,8 @@ export default class Game extends Component {
       opponent: [],       // opponent's cards
       player: [],         // player's cards
       trump: '',
-      opponentHands: [],  // hands won by opponent
-      playerHands: [],    // hands won by player
+      opponentHands: 0,  // points won by opponent
+      playerHands: 0,    // points won by player
       opponentSelection: '',
       playerSelection: '',
       isPlayerFirst: false,
@@ -22,7 +22,13 @@ export default class Game extends Component {
         { image: '6.png', card: 'A', suit: 'c', points: 11 }, { image: '7.png', card: '10', suit: 'c', points: 10 }, { image: '8.png', card: 'K', suit: 'c', points: 4 }, { image: '9.png', card: 'Q', suit: 'c', points: 3 }, { image: '10.png', card: 'J', suit: 'c', points: 2 }, { image: '11.png', card: '9', suit: 'c', points: 0 },
         { image: '12.png', card: 'A', suit: 'd', points: 11 }, { image: '13.png', card: '10', suit: 'd', points: 10 }, { image: '14.png', card: 'K', suit: 'd', points: 4 }, { image: '15.png', card: 'Q', suit: 'd', points: 3 }, { image: '16.png', card: 'J', suit: 'd', points: 2 }, { image: '17.png', card: '9', suit: 'd', points: 0 },
         { image: '18.png', card: 'A', suit: 's', points: 11 }, { image: '19.png', card: '10', suit: 's', points: 10 }, { image: '20.png', card: 'K', suit: 's', points: 4 }, { image: '21.png', card: 'Q', suit: 's', points: 3 }, { image: '22.png', card: 'J', suit: 's', points: 2 }, { image: '23.png', card: '9', suit: 's', points: 0 }
-      ]
+      ],
+      specialNine: {
+        'h': 5,
+        'c': 11,
+        'd': 17,
+        's': 23,
+      }
     };
   }
 
@@ -44,12 +50,10 @@ export default class Game extends Component {
   };
 
   handleCardClick = (cardIndex) => {                               /// PLAYER
-    console.log(`HANDLE CARD CLICK: ${cardIndex}`)
     console.log(this.state.player)
     this.setState(() => ({
       playerSelection: cardIndex
     }), () => {
-      console.log(this.state.playerSelection);
       this.removeCard(cardIndex);
     });
   };
@@ -72,7 +76,6 @@ export default class Game extends Component {
     const randomIndex = Math.floor(Math.random() * this.state.opponent.length);
     const selectedCard = this.state.opponent[randomIndex];
     let updated = this.state.opponent.filter(num => num !== selectedCard);
-    console.log(`opponent ${updated}`);
     this.setState(() => ({
       opponentSelection: selectedCard,
       opponent: updated
@@ -84,11 +87,15 @@ export default class Game extends Component {
     });
   };
 
-  clearSelection = () => {
+  clearSelection = (option, player, opponent) => {
     this.setState(() => ({
       opponentSelection: '',
-      playerSelection: ''
+      playerSelection: '',
+      isPlayerFirst: option,
+      playerHands: this.state.playerHands + player,
+      opponentHands: this.state.opponentHands + opponent
     }), () => {
+      console.log(`Points: ${this.state.playerHands} vs ${this.state.opponentHands}`)
       if (!this.state.isPlayerFirst && this.state.opponent.length > 0) {
         this.opponentTurn();
       }
@@ -102,36 +109,35 @@ export default class Game extends Component {
       if (player.points > opponent.points) {
         console.log('player wins')
         setTimeout(() => {
-          this.clearSelection();
+          this.clearSelection(true, player.points + opponent.points, 0);
         }, 2500)
       } else {
         console.log('opponent wins')
         setTimeout(() => {
-          this.clearSelection();
+          this.clearSelection(false, 0, player.points + opponent.points);
         }, 2500)
       }
-    } else if (player.suit === this.state.trump) {
+    } else if (player.suit === this.state.trump.suit) {
       console.log('player wins')
       setTimeout(() => {
-        this.clearSelection();
+        this.clearSelection(true, player.points + opponent.points, 0);
       }, 2500)
-    } else if (opponent.suit === this.state.trump) {
+    } else if (opponent.suit === this.state.trump.suit) {
       console.log('opponent wins')
       setTimeout(() => {
-        this.clearSelection();
+        this.clearSelection(false, 0, player.points + opponent.points);
       }, 2500)
     } else {
       if (this.state.isPlayerFirst) {
         console.log('player wins')
         setTimeout(() => {
-          this.clearSelection();
+          this.clearSelection(true, player.points + opponent.points, 0);
         }, 2500)
       } else {
         console.log('opponent wins')
         setTimeout(() => {
-          this.clearSelection();
+          this.clearSelection(false, 0, player.points + opponent.points);
         }, 2500)
-
       }
     }
   }
@@ -158,6 +164,12 @@ export default class Game extends Component {
 
           {this.state.opponentSelection === '' ? null : <img className='imgMargin' alt='card' src={`/cards/${this.state.cardMapping[this.state.opponentSelection].image}`} />}
           {this.state.playerSelection === '' ? null : <img className='imgMargin' alt='card' src={`/cards/${this.state.cardMapping[this.state.playerSelection].image}`} />}
+
+          {this.state.playerHands > 0 &&
+            this.state.isPlayerFirst == true &&
+            this.state.player.includes(this.state.specialNine[this.state.trump.suit]) ?
+            <button>Steal center card</button> :
+            null}
         </div>
         <div className='player'>
           {this.state.player.map(cardIndex => {
