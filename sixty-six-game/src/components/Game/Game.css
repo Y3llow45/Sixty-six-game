@@ -47,3 +47,7 @@
   position: sticky;
   z-index: 1;
 }
+
+.goUnder {
+  z-index: -2 !important;
+}

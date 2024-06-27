@@ -89,7 +89,7 @@ export default class Game extends Component {
     });
   };
 
-  clearSelection = (option, player, opponent) => {
+  clearSelection = (option, playerPoints, opponentPoints) => {
     console.log(this.state.opponent, this.state.player, this.state.deck[0], typeof (this.state.deck[0]))
     this.setState(() => {
       const player = this.state.deck.length > 1 ? [...this.state.player, this.state.deck[0]] : this.state.player;
@@ -98,8 +98,8 @@ export default class Game extends Component {
         opponentSelection: '',
         playerSelection: '',
         isPlayerFirst: option,
-        playerHands: this.state.playerHands + player,
-        opponentHands: this.state.opponentHands + opponent,
+        playerHands: this.state.playerHands + playerPoints,
+        opponentHands: this.state.opponentHands + opponentPoints,
         player: player,
         opponent: opponent,
         deck: this.state.deck.slice(2)
@@ -169,12 +169,14 @@ export default class Game extends Component {
           }) : null}
         </div>
         <div className='center'>
-          {this.state.player.length > 0 ? <img className='otherCards' src={`/cards/back.png`}></img> : null}
-          {this.state.player.length > 0 ? <img className='trumpSuit' src={`/cards/${this.state.trump.image}`}></img> : null}
+          {this.state.player.length > 0 && this.state.deck.length > 1 ? <img className='otherCards' src={`/cards/back.png`}></img> : <img className='otherCards goUnder' src='/cards/empty.png'></img>}
+          {this.state.player.length > 0 && this.state.deck.length > 1 ? <img className='trumpSuit' src={`/cards/${this.state.trump.image}`}></img> : <img className='otherCards goUnder' src='/cards/empty.png'></img>}
+
           {this.state.opponentSelection === '' ? null : <img className='imgMargin' alt='card' src={`/cards/${this.state.cardMapping[this.state.opponentSelection].image}`} />}
           {this.state.playerSelection === '' ? null : <img className='imgMargin' alt='card' src={`/cards/${this.state.cardMapping[this.state.playerSelection].image}`} />}
-          {this.state.playerHands > 0 &&
+          {this.state.playerHands > 0 &&      //to do
             this.state.isPlayerFirst == true &&
+            this.state.deck.length > 1 &&
             this.state.player.includes(this.state.specialNine[this.state.trump.suit]) ?
             <button>Steal center card</button> :
             null}
