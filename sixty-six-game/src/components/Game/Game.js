@@ -17,6 +17,7 @@ export default class Game extends Component {
       opponentSelection: '',
       playerSelection: '',
       isPlayerFirst: false,
+      playerCardsClickable: true,
       cardMapping: [
         { image: '0.png', card: 'A', suit: 'h', points: 11 }, { image: '1.png', card: '10', suit: 'h', points: 10 }, { image: '2.png', card: 'K', suit: 'h', points: 4 }, { image: '3.png', card: 'Q', suit: 'h', points: 3 }, { image: '4.png', card: 'J', suit: 'h', points: 2 }, { image: '5.png', card: '9', suit: 'h', points: 0 },
         { image: '6.png', card: 'A', suit: 'c', points: 11 }, { image: '7.png', card: '10', suit: 'c', points: 10 }, { image: '8.png', card: 'K', suit: 'c', points: 4 }, { image: '9.png', card: 'Q', suit: 'c', points: 3 }, { image: '10.png', card: 'J', suit: 'c', points: 2 }, { image: '11.png', card: '9', suit: 'c', points: 0 },
@@ -43,7 +44,7 @@ export default class Game extends Component {
       opponentHands: 0,
       playerHands: 0
     }, () => {
-      console.log(`OP: ${this.state.opponent}, PL: ${this.state.player}, CE: ${this.state.center}, DECK: ${this.state.deck}`)
+      //console.log(`OP: ${this.state.opponent}, PL: ${this.state.player}, CE: ${this.state.center}, DECK: ${this.state.deck}`)
       //this.startGame();
       if (!this.state.isPlayerFirst) {
         this.opponentTurn();
@@ -52,9 +53,11 @@ export default class Game extends Component {
   };
 
   handleCardClick = (cardIndex) => {                               /// PLAYER
-    console.log(this.state.player)
+    if (!this.state.playerCardsClickable) return;
+    //console.log(this.state.player)
     this.setState(() => ({
-      playerSelection: cardIndex
+      playerSelection: cardIndex,
+      playerCardsClickable: false
     }), () => {
       this.removeCard(cardIndex);
     });
@@ -90,7 +93,7 @@ export default class Game extends Component {
   };
 
   clearSelection = (option, playerPoints, opponentPoints) => {
-    console.log(this.state.opponent, this.state.player, this.state.deck[0], typeof (this.state.deck[0]))
+    //console.log(this.state.opponent, this.state.player, this.state.deck[0], typeof (this.state.deck[0]))
     this.setState(() => {
       const player = this.state.deck.length > 1 ? [...this.state.player, this.state.deck[0]] : this.state.player;
       const opponent = this.state.deck.length > 1 ? [...this.state.opponent, this.state.deck[1]] : this.state.opponent;
@@ -102,7 +105,8 @@ export default class Game extends Component {
         opponentHands: this.state.opponentHands + opponentPoints,
         player: player,
         opponent: opponent,
-        deck: this.state.deck.slice(2)
+        deck: this.state.deck.slice(2),
+        playerCardsClickable: true
       }
     }, () => {
       console.log(`Points: ${this.state.playerHands} vs ${this.state.opponentHands} and deck: ${this.state.deck}`)
@@ -152,13 +156,6 @@ export default class Game extends Component {
     }
   }
 
-  /*clearSelection = () => {
-    this.setState({
-      opponentSelection: '',
-      playerSelection: ''
-    })
-  }*/
-
   render() {
     return (
       <div className='game'>
@@ -184,7 +181,7 @@ export default class Game extends Component {
         <div className='player'>
           {this.state.player.map(cardIndex => {
             const card = this.state.cardMapping[cardIndex];
-            return <Card key={cardIndex} image={card.image} card={card.card} onClick={() => this.handleCardClick(cardIndex)} />;
+            return <Card key={cardIndex} image={card.image} card={card.card} clickable={this.state.playerCardsClickable} onClick={() => this.handleCardClick(cardIndex)} />;
           })}
         </div>
       </div>
