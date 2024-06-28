@@ -29,12 +29,14 @@ export default class Game extends Component {
         'c': 11,
         'd': 17,
         's': 23,
-      }
+      },
+      indexOfTrump: 0 //used for stealing this card with a 9 of the same suit
     };
   }
 
   handleGenerateDeck = () => {
-    const shuffledDeck = generateShuffledDeck();
+    //const shuffledDeck = generateShuffledDeck();
+    let shuffledDeck = [10, 1, 5, 14, 4, 17, 21, 23, 19, 15, 0, 2, 18, 7, 16, 6, 8, 12, 3, 13, 11, 9, 22, 20]
     console.log(shuffledDeck);
     this.setState({
       opponent: shuffledDeck.slice(0, 6),
@@ -42,6 +44,7 @@ export default class Game extends Component {
       trump: this.state.cardMapping[shuffledDeck[12]],
       deck: [...shuffledDeck.slice(13), shuffledDeck[12]],
       opponentHands: 0,
+      indexOfTrump: shuffledDeck[12],
       playerHands: 0
     }, () => {
       //console.log(`OP: ${this.state.opponent}, PL: ${this.state.player}, CE: ${this.state.center}, DECK: ${this.state.deck}`)
@@ -156,6 +159,22 @@ export default class Game extends Component {
     }
   }
 
+  stealTrump = (card) => {
+    console.log('STEAL: ' + card);
+    const index = this.state.player.indexOf(card);
+    console.log('index:  ' + index);
+    const newPlayer = [...this.state.player];
+    newPlayer.splice(index, 1);
+    newPlayer.push(this.state.indexOfTrump);
+    console.log('NewP: ' + newPlayer);
+    const newTrump = this.state.cardMapping[card];
+    console.log('NewT: ' + newTrump);
+    this.setState(() => ({
+      player: newPlayer,
+      trump: newTrump
+    }));
+  }
+
   render() {
     return (
       <div className='game'>
@@ -173,9 +192,9 @@ export default class Game extends Component {
           {this.state.playerSelection === '' ? null : <img className='imgMargin' alt='card' src={`/cards/${this.state.cardMapping[this.state.playerSelection].image}`} />}
           {this.state.playerHands > 0 &&      //to do
             this.state.isPlayerFirst == true &&
-            this.state.deck.length > 1 &&
+            this.state.deck.length > 3 &&
             this.state.player.includes(this.state.specialNine[this.state.trump.suit]) ?
-            <button>Steal center card</button> :
+            <button onClick={() => this.stealTrump(this.state.specialNine[this.state.trump.suit])}>Steal trump card</button> :
             null}
         </div>
         <div className='player'>
