@@ -8,7 +8,7 @@ export default class Game extends Component {
     super(props);
 
     this.state = {
-      deck: [],           // cards to draw
+      deck: [],           // cards in the deck (draw 1 every turn)
       opponent: [],       // opponent's cards
       player: [],         // player's cards
       trump: '',
@@ -16,27 +16,33 @@ export default class Game extends Component {
       playerHands: 0,    // points won by player
       opponentSelection: '',
       playerSelection: '',
-      isPlayerFirst: false,
-      playerCardsClickable: true,
+      isPlayerFirst: false,  // card placing order
+      playerCardsClickable: true,  // disable player's card when one card is selected utill cards get compared and put away
       cardMapping: [
         { image: '0.png', card: 'A', suit: 'h', points: 11 }, { image: '1.png', card: '10', suit: 'h', points: 10 }, { image: '2.png', card: 'K', suit: 'h', points: 4 }, { image: '3.png', card: 'Q', suit: 'h', points: 3 }, { image: '4.png', card: 'J', suit: 'h', points: 2 }, { image: '5.png', card: '9', suit: 'h', points: 0 },
         { image: '6.png', card: 'A', suit: 'c', points: 11 }, { image: '7.png', card: '10', suit: 'c', points: 10 }, { image: '8.png', card: 'K', suit: 'c', points: 4 }, { image: '9.png', card: 'Q', suit: 'c', points: 3 }, { image: '10.png', card: 'J', suit: 'c', points: 2 }, { image: '11.png', card: '9', suit: 'c', points: 0 },
         { image: '12.png', card: 'A', suit: 'd', points: 11 }, { image: '13.png', card: '10', suit: 'd', points: 10 }, { image: '14.png', card: 'K', suit: 'd', points: 4 }, { image: '15.png', card: 'Q', suit: 'd', points: 3 }, { image: '16.png', card: 'J', suit: 'd', points: 2 }, { image: '17.png', card: '9', suit: 'd', points: 0 },
         { image: '18.png', card: 'A', suit: 's', points: 11 }, { image: '19.png', card: '10', suit: 's', points: 10 }, { image: '20.png', card: 'K', suit: 's', points: 4 }, { image: '21.png', card: 'Q', suit: 's', points: 3 }, { image: '22.png', card: 'J', suit: 's', points: 2 }, { image: '23.png', card: '9', suit: 's', points: 0 }
       ],
-      specialNine: {
+      specialNine: {        // steal trump card with a 9 of the same suit
         'h': 5,
         'c': 11,
         'd': 17,
         's': 23,
       },
-      indexOfTrump: 0 //used for stealing this card with a 9 of the same suit
+      mirrage: {            // Call 20 or 40
+        'h': [2, 3],
+        'c': [8, 9],
+        'd': [14, 15],
+        's': [20, 21],
+      },
+      indexOfTrump: 0       //used for stealing this card with a 9 of the same suit
     };
   }
 
   handleGenerateDeck = () => {
-    //const shuffledDeck = generateShuffledDeck();
-    let shuffledDeck = [10, 1, 5, 14, 4, 17, 21, 23, 19, 15, 0, 2, 18, 7, 16, 6, 8, 12, 3, 13, 11, 9, 22, 20]
+    const shuffledDeck = generateShuffledDeck();
+    //let shuffledDeck = [10, 1, 5, 14, 4, 17, 21, 23, 19, 15, 0, 2, 18, 7, 16, 6, 8, 12, 3, 13, 11, 9, 22, 20] // test
     console.log(shuffledDeck);
     this.setState({
       opponent: shuffledDeck.slice(0, 6),
@@ -160,15 +166,11 @@ export default class Game extends Component {
   }
 
   stealTrump = (card) => {
-    console.log('STEAL: ' + card);
     const index = this.state.player.indexOf(card);
-    console.log('index:  ' + index);
     const newPlayer = [...this.state.player];
     newPlayer.splice(index, 1);
     newPlayer.push(this.state.indexOfTrump);
-    console.log('NewP: ' + newPlayer);
     const newTrump = this.state.cardMapping[card];
-    console.log('NewT: ' + newTrump);
     this.setState(() => ({
       player: newPlayer,
       trump: newTrump
@@ -190,12 +192,50 @@ export default class Game extends Component {
 
           {this.state.opponentSelection === '' ? null : <img className='imgMargin' alt='card' src={`/cards/${this.state.cardMapping[this.state.opponentSelection].image}`} />}
           {this.state.playerSelection === '' ? null : <img className='imgMargin' alt='card' src={`/cards/${this.state.cardMapping[this.state.playerSelection].image}`} />}
-          {this.state.playerHands > 0 &&      //to do
+
+          {this.state.playerHands > 0 &&
             this.state.isPlayerFirst == true &&
             this.state.deck.length > 3 &&
             this.state.player.includes(this.state.specialNine[this.state.trump.suit]) ?
             <button onClick={() => this.stealTrump(this.state.specialNine[this.state.trump.suit])}>Steal trump card</button> :
             null}
+
+          {this.state.playerHands > 0 &&
+            this.state.isPlayerFirst == true &&
+            this.state.deck.length > 3 &&
+            this.state.player.includes(this.state.mirrage['h'][0]) &&
+            this.state.player.includes(this.state.mirrage['h'][1]) &&
+            this.state.trump.suit !== 'h' ?
+            <button onClick={() => this.call('h')}>Call 20 hearts</button> :
+            null}
+
+          {this.state.playerHands > 0 &&
+            this.state.isPlayerFirst == true &&
+            this.state.deck.length > 3 &&
+            this.state.player.includes(this.state.mirrage['c'][0]) &&
+            this.state.player.includes(this.state.mirrage['c'][1]) &&
+            this.state.trump.suit !== 'c' ?
+            <button onClick={() => this.call('c')}>Call 20 clubs</button> :
+            null}
+
+          {this.state.playerHands > 0 &&
+            this.state.isPlayerFirst == true &&
+            this.state.deck.length > 3 &&
+            this.state.player.includes(this.state.mirrage['d'][0]) &&
+            this.state.player.includes(this.state.mirrage['d'][1]) &&
+            this.state.trump.suit !== 'd' ?
+            <button onClick={() => this.call('d')}>Call 20 diamonds</button> :
+            null}
+
+          {this.state.playerHands > 0 &&
+            this.state.isPlayerFirst == true &&
+            this.state.deck.length > 3 &&
+            this.state.player.includes(this.state.mirrage['s'][0]) &&
+            this.state.player.includes(this.state.mirrage['s'][1]) &&
+            this.state.trump.suit !== 's' ?
+            <button onClick={() => this.call('s')}>Call 20 spades</button> :
+            null}
+
         </div>
         <div className='player'>
           {this.state.player.map(cardIndex => {
