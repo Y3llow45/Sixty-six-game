@@ -63,6 +63,20 @@ export default class Game extends Component {
 
   handleCardClick = (cardIndex) => {                               /// PLAYER
     if (!this.state.playerCardsClickable) return;
+
+    if (this.state.playerHands > 0 && this.state.isPlayerFirst) {
+      const suits = ['h', 'c', 'd', 's'];
+      for (const suit of suits) {
+        if (this.state.player.includes(this.state.mirrage[suit][0]) && this.state.player.includes(this.state.mirrage[suit][1])) {
+          if (this.state.trump.suit === suit) {
+            console.log(`40 points ${suit}`);
+          } else {
+            console.log(`20 points ${suit}`);
+          }
+          break;
+        }
+      }
+    }
     //console.log(this.state.player)
     this.setState(() => ({
       playerSelection: cardIndex,
@@ -200,40 +214,40 @@ export default class Game extends Component {
             <button onClick={() => this.stealTrump(this.state.specialNine[this.state.trump.suit])}>Steal trump card</button> :
             null}
 
-          {this.state.playerHands > 0 &&
+          {(this.state.playerHands > 0 &&
             this.state.isPlayerFirst == true &&
-            this.state.deck.length > 3 &&
             this.state.player.includes(this.state.mirrage['h'][0]) &&
-            this.state.player.includes(this.state.mirrage['h'][1]) &&
+            this.state.player.includes(this.state.mirrage['h'][1])) ?
             this.state.trump.suit !== 'h' ?
-            <button onClick={() => this.call('h')}>Call 20 hearts</button> :
+              <button onClick={() => this.call('h')}>Call 20 hearts</button> :
+              <button onClick={() => this.call(this.state.trump.suit)}>Call 40</button> :
             null}
 
-          {this.state.playerHands > 0 &&
+          {(this.state.playerHands > 0 &&
             this.state.isPlayerFirst == true &&
-            this.state.deck.length > 3 &&
             this.state.player.includes(this.state.mirrage['c'][0]) &&
-            this.state.player.includes(this.state.mirrage['c'][1]) &&
+            this.state.player.includes(this.state.mirrage['c'][1])) ?
             this.state.trump.suit !== 'c' ?
-            <button onClick={() => this.call('c')}>Call 20 clubs</button> :
+              <button onClick={() => this.call('c')}>Call 20 clubs</button> :
+              <button onClick={() => this.call(this.state.trump.suit)}>Call 40</button> :
             null}
 
-          {this.state.playerHands > 0 &&
+          {(this.state.playerHands > 0 &&
             this.state.isPlayerFirst == true &&
-            this.state.deck.length > 3 &&
             this.state.player.includes(this.state.mirrage['d'][0]) &&
-            this.state.player.includes(this.state.mirrage['d'][1]) &&
+            this.state.player.includes(this.state.mirrage['d'][1])) ?
             this.state.trump.suit !== 'd' ?
-            <button onClick={() => this.call('d')}>Call 20 diamonds</button> :
+              <button onClick={() => this.call('d')}>Call 20 diamonds</button> :
+              <button onClick={() => this.call(this.state.trump.suit)}>Call 40</button> :
             null}
 
-          {this.state.playerHands > 0 &&
+          {(this.state.playerHands > 0 &&
             this.state.isPlayerFirst == true &&
-            this.state.deck.length > 3 &&
             this.state.player.includes(this.state.mirrage['s'][0]) &&
-            this.state.player.includes(this.state.mirrage['s'][1]) &&
+            this.state.player.includes(this.state.mirrage['s'][1])) ?
             this.state.trump.suit !== 's' ?
-            <button onClick={() => this.call('s')}>Call 20 spades</button> :
+              <button onClick={() => this.call('s')}>Call 20 spades</button> :
+              <button onClick={() => this.call(this.state.trump.suit)}>Call 40</button> :
             null}
 
         </div>
