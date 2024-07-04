@@ -36,7 +36,9 @@ export default class Game extends Component {
         'd': [14, 15],
         's': [20, 21],
       },
-      indexOfTrump: 0       //used for stealing this card with a 9 of the same suit
+      mirrageCards: [2, 3, 8, 9, 14, 15, 20, 21],
+      indexOfTrump: 0,       //used for stealing this card with a 9 of the same suit
+      isPlaying: false
     };
   }
 
@@ -51,7 +53,8 @@ export default class Game extends Component {
       deck: [...shuffledDeck.slice(13), shuffledDeck[12]],
       opponentHands: 0,
       indexOfTrump: shuffledDeck[12],
-      playerHands: 0
+      playerHands: 0,
+      isPlaying: true
     }, () => {
       //console.log(`OP: ${this.state.opponent}, PL: ${this.state.player}, CE: ${this.state.center}, DECK: ${this.state.deck}`)
       //this.startGame();
@@ -64,14 +67,16 @@ export default class Game extends Component {
   handleCardClick = (cardIndex) => {                               /// PLAYER
     if (!this.state.playerCardsClickable) return;
 
-    if (this.state.playerHands > 0 && this.state.isPlayerFirst) {
+    if (this.state.playerHands > 0 && this.state.isPlayerFirst && this.state.mirrageCards.includes(cardIndex)) {
       const suits = ['h', 'c', 'd', 's'];
       for (const suit of suits) {
         if (this.state.player.includes(this.state.mirrage[suit][0]) && this.state.player.includes(this.state.mirrage[suit][1])) {
           if (this.state.trump.suit === suit) {
             console.log(`40 points ${suit}`);
+            this.setState({ playerHands: this.state.playerHands + 40 })
           } else {
             console.log(`20 points ${suit}`);
+            this.setState({ playerHands: this.state.playerHands + 20 })
           }
           break;
         }
@@ -191,71 +196,60 @@ export default class Game extends Component {
     }));
   }
 
+  callEnd = () => {
+    this.setState({
+      isPlaying: false,
+      deck: [],
+      opponent: [],
+      player: [],
+      trump: '',
+      opponentHands: 0,
+      playerHands: 0,
+      opponentSelection: '',
+      playerSelection: '',
+      playerCardsClickable: true,
+    });
+    if (this.state.playerHands >= 66) {
+      this.setState({ isPlayerFirst: true })
+      console.log('win')
+    } else {
+      this.setState({ isPlayerFirst: false })
+      console.log('opponent wins')
+    }
+  }
+
   render() {
     return (
       <div className='game'>
         <button onClick={this.handleGenerateDeck} className='btnStart'>START</button>
         <div className='opponent'>
-          {this.state.opponent ? this.state.opponent.map(a => {
-            return <Card key={a} image={'back.png'} card={'back'} />
+          {this.state.opponent && this.state.isPlaying ? this.state.opponent.map(a => {
+            return <Card key={a} image={'back.png'} card={'back'} onClick={() => { return }} />
           }) : null}
         </div>
         <div className='center'>
-          {this.state.player.length > 0 && this.state.deck.length > 1 ? <img className='otherCards' src={`/cards/back.png`}></img> : <img className='otherCards goUnder' src='/cards/empty.png'></img>}
-          {this.state.player.length > 0 && this.state.deck.length > 1 ? <img className='trumpSuit' src={`/cards/${this.state.trump.image}`}></img> : <img className='otherCards goUnder' src='/cards/empty.png'></img>}
+          {this.state.isPlaying ? this.state.player.length > 0 && this.state.deck.length > 1 ? <img className='otherCards' src={`/cards/back.png`}></img> : <img className='otherCards goUnder' src='/cards/empty.png'></img> : null}
+          {this.state.isPlaying ? this.state.player.length > 0 && this.state.deck.length > 1 ? <img className='trumpSuit' src={`/cards/${this.state.trump.image}`}></img> : <img className='otherCards goUnder' src='/cards/empty.png'></img> : null}
 
-          {this.state.opponentSelection === '' ? null : <img className='imgMargin' alt='card' src={`/cards/${this.state.cardMapping[this.state.opponentSelection].image}`} />}
-          {this.state.playerSelection === '' ? null : <img className='imgMargin' alt='card' src={`/cards/${this.state.cardMapping[this.state.playerSelection].image}`} />}
+          {this.state.isPlaying ? this.state.opponentSelection === '' ? null : <img className='imgMargin' alt='card' src={`/cards/${this.state.cardMapping[this.state.opponentSelection].image}`} /> : null}
+          {this.state.isPlaying ? this.state.playerSelection === '' ? null : <img className='imgMargin' alt='card' src={`/cards/${this.state.cardMapping[this.state.playerSelection].image}`} /> : null}
 
           {this.state.playerHands > 0 &&
             this.state.isPlayerFirst == true &&
             this.state.deck.length > 3 &&
+            this.state.isPlaying &&
             this.state.player.includes(this.state.specialNine[this.state.trump.suit]) ?
             <button onClick={() => this.stealTrump(this.state.specialNine[this.state.trump.suit])}>Steal trump card</button> :
             null}
 
-          {(this.state.playerHands > 0 &&
-            this.state.isPlayerFirst == true &&
-            this.state.player.includes(this.state.mirrage['h'][0]) &&
-            this.state.player.includes(this.state.mirrage['h'][1])) ?
-            this.state.trump.suit !== 'h' ?
-              <button onClick={() => this.call('h')}>Call 20 hearts</button> :
-              <button onClick={() => this.call(this.state.trump.suit)}>Call 40</button> :
-            null}
-
-          {(this.state.playerHands > 0 &&
-            this.state.isPlayerFirst == true &&
-            this.state.player.includes(this.state.mirrage['c'][0]) &&
-            this.state.player.includes(this.state.mirrage['c'][1])) ?
-            this.state.trump.suit !== 'c' ?
-              <button onClick={() => this.call('c')}>Call 20 clubs</button> :
-              <button onClick={() => this.call(this.state.trump.suit)}>Call 40</button> :
-            null}
-
-          {(this.state.playerHands > 0 &&
-            this.state.isPlayerFirst == true &&
-            this.state.player.includes(this.state.mirrage['d'][0]) &&
-            this.state.player.includes(this.state.mirrage['d'][1])) ?
-            this.state.trump.suit !== 'd' ?
-              <button onClick={() => this.call('d')}>Call 20 diamonds</button> :
-              <button onClick={() => this.call(this.state.trump.suit)}>Call 40</button> :
-            null}
-
-          {(this.state.playerHands > 0 &&
-            this.state.isPlayerFirst == true &&
-            this.state.player.includes(this.state.mirrage['s'][0]) &&
-            this.state.player.includes(this.state.mirrage['s'][1])) ?
-            this.state.trump.suit !== 's' ?
-              <button onClick={() => this.call('s')}>Call 20 spades</button> :
-              <button onClick={() => this.call(this.state.trump.suit)}>Call 40</button> :
-            null}
+          {this.state.isPlaying ? <button onClick={() => this.callEnd()}>Call 66</button> : null}
 
         </div>
         <div className='player'>
-          {this.state.player.map(cardIndex => {
+          {this.state.isPlaying ? this.state.player.map(cardIndex => {
             const card = this.state.cardMapping[cardIndex];
-            return <Card key={cardIndex} image={card.image} card={card.card} clickable={this.state.playerCardsClickable} onClick={() => this.handleCardClick(cardIndex)} />;
-          })}
+            return <Card key={cardIndex} image={card.image} card={card.card} clickable={this.state.playerCardsClickable} onClick={() => this.handleCardClick(cardIndex)} />
+          }) : null}
         </div>
       </div>
     )
