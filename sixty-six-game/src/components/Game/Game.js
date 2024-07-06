@@ -54,7 +54,8 @@ export default class Game extends Component {
       opponentHands: 0,
       indexOfTrump: shuffledDeck[12],
       playerHands: 0,
-      isPlaying: true
+      isPlaying: true,
+      isClosed: false
     }, () => {
       //console.log(`OP: ${this.state.opponent}, PL: ${this.state.player}, CE: ${this.state.center}, DECK: ${this.state.deck}`)
       //this.startGame();
@@ -64,7 +65,7 @@ export default class Game extends Component {
     });
   };
 
-  handleCardClick = (cardIndex) => {                               /// PLAYER
+  handleCardClick = (cardIndex) => {
     if (!this.state.playerCardsClickable) return;
 
     if (this.state.playerHands > 0 && this.state.isPlayerFirst && this.state.mirrageCards.includes(cardIndex)) {
@@ -208,6 +209,7 @@ export default class Game extends Component {
       opponentSelection: '',
       playerSelection: '',
       playerCardsClickable: true,
+      isClosed: false
     });
     if (this.state.playerHands >= 66) {
       this.setState({ isPlayerFirst: true })
@@ -216,6 +218,16 @@ export default class Game extends Component {
       this.setState({ isPlayerFirst: false })
       console.log('opponent wins')
     }
+  }
+
+  close = () => {
+    this.setState(() => {
+      return {
+        isClosed: true
+      }
+    }, () => {
+      console.log(`closed!`)
+    })
   }
 
   render() {
@@ -227,12 +239,27 @@ export default class Game extends Component {
             return <Card key={a} image={'back.png'} card={'back'} onClick={() => { return }} />
           }) : null}
         </div>
-        <div className='center'>
-          {this.state.isPlaying ? this.state.player.length > 0 && this.state.deck.length > 1 ? <img className='otherCards' src={`/cards/back.png`}></img> : <img className='otherCards goUnder' src='/cards/empty.png'></img> : null}
-          {this.state.isPlaying ? this.state.player.length > 0 && this.state.deck.length > 1 ? <img className='trumpSuit' src={`/cards/${this.state.trump.image}`}></img> : <img className='otherCards goUnder' src='/cards/empty.png'></img> : null}
 
-          {this.state.isPlaying ? this.state.opponentSelection === '' ? null : <img className='imgMargin' alt='card' src={`/cards/${this.state.cardMapping[this.state.opponentSelection].image}`} /> : null}
-          {this.state.isPlaying ? this.state.playerSelection === '' ? null : <img className='imgMargin' alt='card' src={`/cards/${this.state.cardMapping[this.state.playerSelection].image}`} /> : null}
+        <div className='center'>
+          {this.state.isPlaying ?
+            this.state.player.length > 0 && this.state.deck.length > 1 ?
+              <img className={this.state.isClosed ? 'closed' : 'otherCards'} src={`/cards/back.png`}></img> :
+              <img className='otherCards goUnder' src='/cards/empty.png'></img> : null}
+          {this.state.isPlaying ?
+            this.state.player.length > 0 && this.state.deck.length > 1 && this.state.isClosed == false ?
+              <img className='trumpSuit' src={`/cards/${this.state.trump.image}`}></img> :
+              <img className='otherCards goUnder' src='/cards/empty.png'></img> : null}
+
+          {this.state.isPlaying ?
+            this.state.opponentSelection === '' ?
+              null :
+              <img className='imgMargin' alt='card' src={`/cards/${this.state.cardMapping[this.state.opponentSelection].image}`} /> :
+            null}
+          {this.state.isPlaying ?
+            this.state.playerSelection === '' ?
+              null :
+              <img className='imgMargin' alt='card' src={`/cards/${this.state.cardMapping[this.state.playerSelection].image}`} /> :
+            null}
 
           {this.state.playerHands > 0 &&
             this.state.isPlayerFirst == true &&
@@ -241,8 +268,12 @@ export default class Game extends Component {
             this.state.player.includes(this.state.specialNine[this.state.trump.suit]) ?
             <button onClick={() => this.stealTrump(this.state.specialNine[this.state.trump.suit])}>Steal trump card</button> :
             null}
-
-          {this.state.isPlaying ? <button onClick={() => this.callEnd()}>Call 66</button> : null}
+          {this.state.isPlaying ?
+            <button onClick={() => this.callEnd()}>Call 66</button> :
+            null}
+          {this.state.deck.length > 3 && this.state.isPlaying && this.state.isPlayerFirst == true && this.state.isClosed == false ?
+            <button onClick={() => this.close()}>Close Deck</button> :
+            null}
 
         </div>
         <div className='player'>

@@ -46,8 +46,18 @@
   margin-right: -55px;
   position: sticky;
   z-index: 1;
+  margin-top: 60px;
 }
 
 .goUnder {
   z-index: -2 !important;
+}
+
+.closed {
+  margin-left: 40px !important;
+  margin-bottom: 60px;
+  margin-right: 0px !important;
+  position: sticky;
+  z-index: 1;
+  margin-top: 60px;
 }
