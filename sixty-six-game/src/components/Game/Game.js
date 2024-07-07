@@ -9,6 +9,7 @@ export default class Game extends Component {
 
     this.state = {
       deck: [],           // cards in the deck (draw 1 every turn)
+      score: [0, 0],
       opponent: [],       // opponent's cards
       player: [],         // player's cards
       trump: '',
@@ -16,13 +17,13 @@ export default class Game extends Component {
       playerHands: 0,    // points won by player
       opponentSelection: '',
       playerSelection: '',
-      isPlayerFirst: false,  // card placing order
+      isPlayerFirst: true,  // card placing order
       playerCardsClickable: true,  // disable player's card when one card is selected utill cards get compared and put away
       cardMapping: [
-        { image: '0.png', card: 'A', suit: 'h', points: 11 }, { image: '1.png', card: '10', suit: 'h', points: 10 }, { image: '2.png', card: 'K', suit: 'h', points: 4 }, { image: '3.png', card: 'Q', suit: 'h', points: 3 }, { image: '4.png', card: 'J', suit: 'h', points: 2 }, { image: '5.png', card: '9', suit: 'h', points: 0 },
-        { image: '6.png', card: 'A', suit: 'c', points: 11 }, { image: '7.png', card: '10', suit: 'c', points: 10 }, { image: '8.png', card: 'K', suit: 'c', points: 4 }, { image: '9.png', card: 'Q', suit: 'c', points: 3 }, { image: '10.png', card: 'J', suit: 'c', points: 2 }, { image: '11.png', card: '9', suit: 'c', points: 0 },
-        { image: '12.png', card: 'A', suit: 'd', points: 11 }, { image: '13.png', card: '10', suit: 'd', points: 10 }, { image: '14.png', card: 'K', suit: 'd', points: 4 }, { image: '15.png', card: 'Q', suit: 'd', points: 3 }, { image: '16.png', card: 'J', suit: 'd', points: 2 }, { image: '17.png', card: '9', suit: 'd', points: 0 },
-        { image: '18.png', card: 'A', suit: 's', points: 11 }, { image: '19.png', card: '10', suit: 's', points: 10 }, { image: '20.png', card: 'K', suit: 's', points: 4 }, { image: '21.png', card: 'Q', suit: 's', points: 3 }, { image: '22.png', card: 'J', suit: 's', points: 2 }, { image: '23.png', card: '9', suit: 's', points: 0 }
+        { image: '0.png', card: 'A', suit: 'h', points: 11 }, { image: '1.png', card: '10', suit: 'h', points: 10 }, { image: '2.png', card: 'K', suit: 'h', points: 4 }, { image: '3.png', card: 'Q', suit: 'h', points: 3 }, { image: '4.png', card: 'J', suit: 'h', points: 2 }, { image: '5.png', card: '9', suit: 'h', points: 0.1 },
+        { image: '6.png', card: 'A', suit: 'c', points: 11 }, { image: '7.png', card: '10', suit: 'c', points: 10 }, { image: '8.png', card: 'K', suit: 'c', points: 4 }, { image: '9.png', card: 'Q', suit: 'c', points: 3 }, { image: '10.png', card: 'J', suit: 'c', points: 2 }, { image: '11.png', card: '9', suit: 'c', points: 0.1 },
+        { image: '12.png', card: 'A', suit: 'd', points: 11 }, { image: '13.png', card: '10', suit: 'd', points: 10 }, { image: '14.png', card: 'K', suit: 'd', points: 4 }, { image: '15.png', card: 'Q', suit: 'd', points: 3 }, { image: '16.png', card: 'J', suit: 'd', points: 2 }, { image: '17.png', card: '9', suit: 'd', points: 0.1 },
+        { image: '18.png', card: 'A', suit: 's', points: 11 }, { image: '19.png', card: '10', suit: 's', points: 10 }, { image: '20.png', card: 'K', suit: 's', points: 4 }, { image: '21.png', card: 'Q', suit: 's', points: 3 }, { image: '22.png', card: 'J', suit: 's', points: 2 }, { image: '23.png', card: '9', suit: 's', points: 0.1 }
       ],
       specialNine: {        // steal trump card with a 9 of the same suit
         'h': 5,
@@ -124,8 +125,8 @@ export default class Game extends Component {
   clearSelection = (option, playerPoints, opponentPoints) => {
     //console.log(this.state.opponent, this.state.player, this.state.deck[0], typeof (this.state.deck[0]))
     this.setState(() => {
-      const player = this.state.deck.length > 1 ? [...this.state.player, this.state.deck[0]] : this.state.player;
-      const opponent = this.state.deck.length > 1 ? [...this.state.opponent, this.state.deck[1]] : this.state.opponent;
+      const player = this.state.deck.length > 1 && !this.state.isClosed ? [...this.state.player, this.state.deck[0]] : this.state.player;
+      const opponent = this.state.deck.length > 1 && !this.state.isClosed ? [...this.state.opponent, this.state.deck[1]] : this.state.opponent;
       return {
         opponentSelection: '',
         playerSelection: '',
@@ -138,6 +139,9 @@ export default class Game extends Component {
         playerCardsClickable: true
       }
     }, () => {
+      if (this.state.player.length == 0 && this.state.opponent.length == 0) {
+        this.callEnd()
+      }
       console.log(`Points: ${this.state.playerHands} vs ${this.state.opponentHands} and deck: ${this.state.deck}`)
       if (!this.state.isPlayerFirst && this.state.opponent.length > 0) {
         this.opponentTurn();
@@ -212,11 +216,37 @@ export default class Game extends Component {
       isClosed: false
     });
     if (this.state.playerHands >= 66) {
-      this.setState({ isPlayerFirst: true })
-      console.log('win')
+      let points;
+      if (this.state.opponentHands == 0) {
+        console.log('3 points for player')
+        points = 3;
+      } else if (this.state.opponentHands < 33) {
+        console.log('2 points for player')
+        points = 2;
+      } else {
+        console.log('1 points for player')
+        points = 1;
+      }
+      this.setState(prevState => ({
+        isPlayerFirst: true,
+        score: [prevState.score[0] + points, prevState.score[1]]
+      }));
     } else {
-      this.setState({ isPlayerFirst: false })
-      console.log('opponent wins')
+      let points;
+      if (this.state.playerHands == 0) {
+        console.log('3 points for opponent')
+        points = 3;
+      } else if (this.state.opponentHands < 33) {
+        console.log('2 points for opponent')
+        points = 2;
+      } else {
+        console.log('1 points for opponent')
+        points = 1;
+      }
+      this.setState(prevState => ({
+        isPlayerFirst: false,
+        score: [prevState.score[0], prevState.score[1] + points]
+      }));
     }
   }
 
@@ -234,6 +264,10 @@ export default class Game extends Component {
     return (
       <div className='game'>
         <button onClick={this.handleGenerateDeck} className='btnStart'>START</button>
+        <div className='score'>
+          <p>You : Bot</p>
+          <p>{this.state.score.join(' : ')}</p>
+        </div>
         <div className='opponent'>
           {this.state.opponent && this.state.isPlaying ? this.state.opponent.map(a => {
             return <Card key={a} image={'back.png'} card={'back'} onClick={() => { return }} />
@@ -265,6 +299,7 @@ export default class Game extends Component {
             this.state.isPlayerFirst == true &&
             this.state.deck.length > 3 &&
             this.state.isPlaying &&
+            this.state.isClosed == false &&
             this.state.player.includes(this.state.specialNine[this.state.trump.suit]) ?
             <button onClick={() => this.stealTrump(this.state.specialNine[this.state.trump.suit])}>Steal trump card</button> :
             null}

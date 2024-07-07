@@ -18,6 +18,7 @@
   border: solid 1px black;
   font-size: 25px;
   transition: 0.5s ease-in-out;
+  margin-bottom: 0px;
 }
 
 .btnStart:hover {
