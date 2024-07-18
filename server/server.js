@@ -3,9 +3,11 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
 const Book = require("./models/Book");
+const User = require("./models/User");
 
 const app = express()
 const PORT = parseInt(process.env.PORT, 10)
+const saltRounds = parseInt(process.env.saltRounds, 10)
 const AtlasUri = process.env.ATLASURI;
 
 app.use(cors());
@@ -14,12 +16,55 @@ mongoose.connect(AtlasUri).then(() => {
   console.log('Connected to db');
 })
 
-app.post('/register', (req, res) => {
-  res.status(200).json({ message: 'register' })
+app.post('/register', async (req, res) => {
+  try {
+    let { username, password } = req.body;
+    const testUsername = await User.find({ username: username })
+    if (testUsername.length > 0) {
+      return res.status(400).json({ message: 'Username already exists' });
+    }
+    bcrypt
+      .hash(password, saltRounds)
+      .then(hash => {
+        let newUser = new User({ username: username, password: hash })
+        newUser.save();
+      })
+      .catch((err) => { throw err })
+  }
+  catch (error) {
+    res.statusMessage = `${error}`;
+    res.status(500).send();
+  }
+  res.status(201).json({ message: 'Account created' });
 })
 
-app.post('/login', (req, res) => {
-  res.status(200).json({ message: 'login' })
+app.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+  try {
+    const user = await User.find({ username: username });
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+    bcrypt
+      .hash(user.password, saltRounds)
+      .then(hash => {
+        user.password = hash;
+      })
+      .catch((err) => { throw err })
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+      res.status(401).json({ error: 'Invalid credentials' });
+      return;
+    }
+    const token = generateToken(user._id, user.username);
+    res.status(200).json({ message: 'Sign in successful', token, username: user.username });
+
+  } catch (error) {
+    console.error('Error during sign-in:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 })
 
 app.get('/test', async (req, res) => {
