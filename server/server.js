@@ -43,7 +43,7 @@ app.get('/test', async (req, res) => {
   } catch (error) {
     console.log(error)
   }
-  res.status(200).json({ message: 'done' })
+  res.status(200).json({ message: 'created' })
 })
 
 app.listen(PORT, () => {

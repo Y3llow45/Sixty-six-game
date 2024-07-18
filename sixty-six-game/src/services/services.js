@@ -1,4 +1,4 @@
-import { displayInfo } from "../components/Notify/Notify";
+import { displayInfo, displaySuccess } from "../components/Notify/Notify";
 const url = 'http://localhost:5242/';
 
 export const register = (username, password) => {
@@ -34,6 +34,26 @@ export const checkUsername = (username) => {
     .then(data => {
       if (data.message === 'true') {
         displayInfo("Username already exists")
+        return true;
+      }
+      return false;
+    })
+    .catch(
+      (error) => console.log(error)
+    );
+};
+
+export const test = () => {
+  return fetch(`${url}test`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.message === 'created') {
+        displaySuccess('Created!')
         return true;
       }
       return false;

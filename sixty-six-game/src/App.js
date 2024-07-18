@@ -4,6 +4,7 @@ import { Switch, Route } from 'react-router-dom'
 import Register from './components/Register/Register';
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Test from './components/Test/Test';
 
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
       <Switch>
         <Route path='/' exact component={Game}></Route>
         <Route path='/register' component={Register}></Route>
+        <Route path='/test' component={Test}></Route>
       </Switch>
     </div>
   );
