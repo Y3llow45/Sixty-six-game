@@ -1,4 +1,5 @@
-const url = 'http://localhost:5000/';
+import { displayInfo } from "../components/Notify/Notify";
+const url = 'http://localhost:5242/';
 
 export const register = (username, password) => {
   let user = { username, password }
