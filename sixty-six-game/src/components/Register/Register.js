@@ -25,16 +25,20 @@ const Register = () => {
       return;
     }
     try {
-      const response = await register(username, password);
-      const data = await response.json();
-      if (data.success) {
-        displaySuccess('Registration successful');
-        localStorage.setItem('token', data.token)
-        localStorage.setItem('username', data.username)
-        history.push('/lessons/0')
-      } else {
-        displayError('Registration failed');
-      }
+      console.log(username, password)
+      await register(username, password).then(async (response) => {
+        return await response.json();
+      }).then((data) => {
+        if (data.success) {
+          displaySuccess('Registration successful');
+          localStorage.setItem('token', data.token)
+          localStorage.setItem('username', data.username)
+          history.push('/lessons/0')
+        } else {
+          displayError('Registration failed');
+        }
+      })
+
     } catch (error) {
       console.log(error);
     }

@@ -14,4 +14,4 @@ const bookSchema = new mongoose.Schema({
   rating: { type: Number, default: 0 },
 })
 
-module.exports = mongoose.model("Book", bookSchema)
+module.exports = mongoose.model("Book", bookSchema, 'books')

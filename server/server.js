@@ -2,6 +2,9 @@ const express = require('express')
 const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
+const bcrypt = require('bcrypt');
+const generateToken = require('./services/genToken');
+const bodyParser = require('body-parser');
 const Book = require("./models/Book");
 const User = require("./models/User");
 
@@ -11,6 +14,7 @@ const saltRounds = parseInt(process.env.saltRounds, 10)
 const AtlasUri = process.env.ATLASURI;
 
 app.use(cors());
+app.use(bodyParser.json());
 
 mongoose.connect(AtlasUri).then(() => {
   console.log('Connected to db');
@@ -20,21 +24,27 @@ app.post('/register', async (req, res) => {
   try {
     let { username, password } = req.body;
     const testUsername = await User.find({ username: username })
+    console.log('find')
     if (testUsername.length > 0) {
+      console.log(testUsername)
       return res.status(400).json({ message: 'Username already exists' });
     }
+    console.log('continnuing')
     bcrypt
       .hash(password, saltRounds)
       .then(hash => {
         let newUser = new User({ username: username, password: hash })
+        console.log('before saving')
         newUser.save();
+        console.log('saved')
       })
       .catch((err) => { throw err })
   }
   catch (error) {
     res.statusMessage = `${error}`;
-    res.status(500).send();
+    return res.status(500).send();
   }
+  console.log('acc created')
   res.status(201).json({ message: 'Account created' });
 })
 
@@ -90,6 +100,20 @@ app.get('/test', async (req, res) => {
   }
   res.status(200).json({ message: 'created' })
 })
+
+app.get('/checkUsername/:username', async (req, res) => {
+  try {
+    let { username } = req.params;
+    user = await User.findOne({ username: input });
+    if (!lesson) {
+      return res.status(200).json({ message: 'false' });
+    } else {
+      return res.status(200).json({ message: 'true' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
 app.listen(PORT, () => {
   console.log(`Server is listening on port: ${PORT}`)
