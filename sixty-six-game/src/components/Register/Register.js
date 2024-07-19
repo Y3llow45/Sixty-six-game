@@ -2,11 +2,14 @@ import styles from './Register.module.css';
 import { useState } from 'react';
 import { checkUsername, register } from '../../services/services'
 import { displaySuccess, displayError, displayInfo } from '../Notify/Notify'
+import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
+import Form from '../Form/Form';
 
 const Register = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const history = useHistory();
 
   const handleUsernameBlur = async () => {
     const exists = await checkUsername(username);
@@ -26,6 +29,9 @@ const Register = () => {
       const data = await response.json();
       if (data.success) {
         displaySuccess('Registration successful');
+        localStorage.setItem('token', data.token)
+        localStorage.setItem('username', data.username)
+        history.push('/lessons/0')
       } else {
         displayError('Registration failed');
       }
@@ -36,31 +42,14 @@ const Register = () => {
 
   return (
     <div className={styles.container}>
-      <h2>Register</h2>
       <form onSubmit={handleSubmit}>
-        <div className={styles.formGroup}>
-          <label htmlFor="username">Username:</label>
-          <input
-            type="text"
-            id="username"
-            name="username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            onBlur={handleUsernameBlur}
-            required
-          />
-        </div>
-        <div className={styles.formGroup}>
-          <label htmlFor="password">Password:</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
+        <h2>Register</h2>
+        <Form handleSubmit={handleSubmit}
+          handleUsernameBlur={handleUsernameBlur}
+          setUsername={setUsername}
+          setPassword={setPassword}
+          username={username}
+          password={password} />
         <div className={styles.formGroup}>
           <label htmlFor="confirmPassword">Confirm Password:</label>
           <input
