@@ -6,6 +6,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Test from './components/Test/Test';
 import Login from './components/Login/Login';
+import Home from './components/Home/Home';
 
 
 function App() {
@@ -25,7 +26,8 @@ function App() {
         theme="light"
       />
       <Switch>
-        <Route path='/' exact component={Game}></Route>
+        <Route path='/' exact component={Home}></Route>
+        <Route path='/game' component={Game}></Route>
         <Route path='/register' component={Register}></Route>
         <Route path='/test' component={Test}></Route>
         <Route path='/login' component={Login}></Route>
