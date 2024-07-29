@@ -4,6 +4,7 @@ import { login } from '../../services/services';
 import { displayError, displaySuccess } from '../Notify/Notify';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 import Form from '../Form/Form';
+import { NavLink } from 'react-router-dom/cjs/react-router-dom';
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -35,6 +36,7 @@ const Login = () => {
   return (
     <div className={styles.container}>
       <form onSubmit={handleSubmit}>
+        <NavLink to='/register'>Register</NavLink>
         <h2>Login</h2>
         <Form handleSubmit={handleSubmit}
           setUsername={setUsername}

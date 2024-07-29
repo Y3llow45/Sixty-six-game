@@ -15,6 +15,7 @@ function Home() {
       <NavLink to='/register'>Register</NavLink>
       <br />
       <Link to='register'>Register here!</Link>
+      <NavLink to="/signup">Sign Up</NavLink>
       <br />
       <NavLink to='/login'>Login</NavLink>
     </div>

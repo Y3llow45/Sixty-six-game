@@ -26,11 +26,11 @@ function App() {
         theme="light"
       />
       <Switch>
-        <Route path='/' exact component={Home}></Route>
-        <Route path='/game' component={Game}></Route>
-        <Route path='/register' component={Register}></Route>
-        <Route path='/test' component={Test}></Route>
-        <Route path='/login' component={Login}></Route>
+        <Route path='/' exact component={Home} />
+        <Route path='/game' component={Game} />
+        <Route path='/register' component={Register} />
+        <Route path='/test' component={Test} />
+        <Route path='/login' component={Login} />
       </Switch>
     </div>
   );
