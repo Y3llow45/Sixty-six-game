@@ -2,14 +2,14 @@ import styles from './Register.module.css';
 import { useState } from 'react';
 import { checkUsername, register } from '../../services/services'
 import { displaySuccess, displayError, displayInfo } from '../Notify/Notify'
-import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
+//import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 import Form from '../Form/Form';
 
 const Register = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const history = useHistory();
+  //const history = useHistory();
 
   const handleUsernameBlur = async () => {
     const exists = await checkUsername(username);
@@ -33,7 +33,7 @@ const Register = () => {
           displaySuccess('Registration successful');
           localStorage.setItem('token', data.token)
           localStorage.setItem('username', data.username)
-          history.push('/lessons/0')
+          //history.push('/lessons/0')
         } else {
           displayError('Registration failed');
         }

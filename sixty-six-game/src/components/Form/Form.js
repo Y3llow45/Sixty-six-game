@@ -1,7 +1,7 @@
 import styles from './Form.module.css';
 const Form = ({ handleUsernameBlur, setUsername, setPassword, username, password }) => {
   return (
-    <fragment>
+    <div>
       <div className={styles.formGroup}>
         <label htmlFor="username">Username:</label>
         <input
@@ -25,7 +25,7 @@ const Form = ({ handleUsernameBlur, setUsername, setPassword, username, password
           required
         />
       </div>
-    </fragment>
+    </div>
   )
 }
 

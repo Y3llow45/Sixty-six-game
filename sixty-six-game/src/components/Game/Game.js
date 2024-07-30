@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { generateShuffledDeck } from '../../utils';
 import Card from './Card/Card';
 import './Game.css';
+import { NavLink } from 'react-router-dom';
 
 export default class Game extends Component {
   constructor(props) {
@@ -263,6 +264,7 @@ export default class Game extends Component {
   render() {
     return (
       <div className='game'>
+        <NavLink to='/'>Go to Home Page</NavLink>
         <button onClick={this.handleGenerateDeck} className='btnStart'>START</button>
         <div className='score'>
           <p>You : Bot</p>

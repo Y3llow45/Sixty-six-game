@@ -2,15 +2,14 @@ import React, { useState } from 'react';
 import styles from './Login.module.css';
 import { login } from '../../services/services';
 import { displayError, displaySuccess } from '../Notify/Notify';
-import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 import Form from '../Form/Form';
-import { NavLink } from 'react-router-dom/cjs/react-router-dom';
+import { NavLink } from 'react-router-dom';
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  const history = useHistory();
+  //const history = useHistory();
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -25,7 +24,7 @@ const Login = () => {
           localStorage.setItem('token', data.token)
           localStorage.setItem('username', data.username)
           displaySuccess('Logged in')
-          history.push('/lessons/0')
+          //history.push('/lessons/0')
         } else {
           displayError("Status error")
         }
