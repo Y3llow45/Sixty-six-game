@@ -1,26 +1,50 @@
+import { useState } from 'react';
+import io from 'socket.io-client';
 import styles from './Home.module.css';
-//import { useState } from 'react';
-//import { displaySuccess, displayError } from '../Notify/Notify';
-//import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
-import { NavLink } from 'react-router-dom';
+
+const socket = io('http://localhost:5243');
 
 function Home() {
-  /*const [username, setUsername] = useState('');
-  const history = useHistory();*/
+  const [username, setUsername] = useState('');
+  const [room, setRoom] = useState('');
+
+  const joinRoom = () => {
+    if (username && room) {
+      socket.emit('joinRoom', { username, room });
+    }
+  };
+
+  const createRoom = () => {
+    if (username && room) {
+      socket.emit('createRoom', { username, room });
+      console.log(`${username} created room: ${room}`);
+    }
+  };
+
+  const leaveRoom = () => {
+    if (username && room) {
+      socket.emit('leaveRoom', { username, room });
+    }
+  };
 
   return (
     <div className={styles.container}>
-      <h1>hello from home page</h1>
-      <NavLink to='/register'>Register</NavLink>
-      <NavLink to='/game'>Game</NavLink>
-      <NavLink to='/test'>Test</NavLink>
-      <br />
-
-      <NavLink to='/game'>Sign Up</NavLink>
-      <br />
-      <NavLink to='/login'>Login</NavLink>
+      <br /><br /><br /><br />
+      <input
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+        placeholder="Username"
+      />
+      <input
+        value={room}
+        onChange={(e) => setRoom(e.target.value)}
+        placeholder="Room"
+      />
+      <button onClick={createRoom}>Create Room</button>
+      <button onClick={joinRoom}>Join Room</button>
+      <button onClick={leaveRoom}>Leave Room</button>
     </div>
   );
-};
+}
 
 export default Home;
