@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon server.js"
+    "startboth": "concurrently \"nodemon server.js\" \"nodemon socket.js\"",
+    "start": "nodemon socket.js"
   },
   "keywords": [],
   "author": "",
@@ -20,5 +21,8 @@
     "mongoose": "^7.4.5",
     "nodemon": "^3.1.4",
     "socket.io": "^4.7.5"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
   }
 }

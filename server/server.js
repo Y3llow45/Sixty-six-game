@@ -10,41 +10,8 @@ const User = require("./models/User");
 
 const app = express()
 const PORT = parseInt(process.env.PORT, 10)
-const SPORT = parseInt(process.env.SPORT, 10)
 const saltRounds = parseInt(process.env.saltRounds, 10)
 const AtlasUri = process.env.ATLASURI;
-
-const server = require('http').createServer(app);
-const io = require('socket.io')(server, {
-  cors: {
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST"]
-  }
-});
-
-io.on('connection', (socket) => {
-  console.log('A user connected:', socket.id);
-
-  socket.on('joinRoom', ({ username, room }) => {
-    socket.join(room);
-    console.log(`${username} joined room: ${room}`);
-    io.to(room).emit('message', `${username} has joined the room`);
-  });
-
-  socket.on('leaveRoom', ({ username, room }) => {
-    socket.leave(room);
-    console.log(`${username} left room: ${room}`);
-    io.to(room).emit('message', `${username} has left the room`);
-  });
-
-  socket.on('disconnect', () => {
-    console.log('A user disconnected:', socket.id);
-  });
-});
-
-server.listen(SPORT, () => {
-  console.log(`Socket.io server is listening on port: ${SPORT}`)
-})
 
 app.use(cors());
 app.use(bodyParser.json());
