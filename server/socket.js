@@ -22,26 +22,25 @@ io.on('connection', (socket) => {
     callback({ status: 'ok' });
   });
 
-  socket.on('joinRoom', ({ username, room }) => {
+  socket.on('joinRoom', ({ username, room }, callback) => {
     const roomData = io.sockets.adapter.rooms.get(room);
     if (roomData) {
       const roomSize = roomData.size;
       if (roomSize === 1) {
-        if (io.sockets.adapter.rooms[room]) {
-          socket.join(room);
-          console.log(`${username} joined room: ${room}`);
-          io.to(rooms[room].admin).emit('readyToStart');
-          callback({ status: 'ok' });
-        } else {
-          callback({ status: 'error', message: 'Room does not exist' });
-        }
+        socket.join(room);
+        console.log(`${username} joined room: ${room}`);
+        io.to(rooms[room].admin).emit('readyToStart');
+        callback({ status: 'ok' });
       } else {
+        console.log('server is full')
         callback({ status: 'error', message: 'Room is full' });
       }
+    } else {
+      console.log('no room data')
     }
   });
 
-  socket.on('leaveRoom', ({ username, room }) => {
+  socket.on('leaveRoom', ({ username, room }, callback) => {
     if (socket.rooms.has(room)) {
       socket.leave(room);
       console.log(`${username} left room: ${room}`);

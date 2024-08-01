@@ -28,16 +28,21 @@ function Home() {
   }, []);
 
   const joinRoom = () => {
-    if (username && room) {
-      socket.emit('joinRoom', { username, room }, (response) => {
-        if (response.status === 'ok') {
-          setJoinedRoom(true);
-          displaySuccess(`${username} joined room: ${room}`);
-        } else {
-          displayError('Failed to join room')
-        }
-      });
+    try {
+      if (username && room) {
+        socket.emit('joinRoom', { username, room }, (response) => {
+          if (response.status === 'ok') {
+            setJoinedRoom(true);
+            displaySuccess(`${username} joined room: ${room}`);
+          } else {
+            displayError('Failed to join room')
+          }
+        });
+      }
+    } catch (error) {
+      console.log(error);
     }
+    console.log('did you joined a room: ' + joinedRoom)
   };
 
   const createRoom = () => {
@@ -45,7 +50,8 @@ function Home() {
       socket.emit('createRoom', { username, room }, (response) => {
         if (response.status === 'ok') {
           displaySuccess(`${username} created room: ${room}`);
-          setIsAdmin(response.isAdmin);
+          setIsAdmin(true);
+          setJoinedRoom(true);
         } else {
           displayError(`Failed to create room: ${response.message}`);
         }
@@ -58,6 +64,8 @@ function Home() {
       socket.emit('leaveRoom', { username, room }, (response) => {
         if (response.status === 'ok') {
           setRoom('')
+          setJoinedRoom(false);
+          setIsAdmin(false);
           displaySuccess(`${username} left room: ${room}`)
         } else {
           displayError(`Failed to leave room: ${response.message}`)
@@ -65,6 +73,14 @@ function Home() {
       });
     }
   };
+
+  const logState = () => {
+    console.log(username);
+    console.log(room);
+    console.log(joinedRoom);
+    console.log(isAdmin);
+    console.log(readyToStart);
+  }
 
   return (
     <div className={styles.container}>
@@ -79,16 +95,20 @@ function Home() {
         onChange={(e) => setRoom(e.target.value)}
         placeholder="Room"
       />
-      {room === '' ?
+      <button onClick={logState}>Log State</button>
+      {joinedRoom ?
+        <div>
+          <button onClick={leaveRoom}>Leave Room</button>
+        </div> :
         <div>
           <button onClick={createRoom}>Create Room</button>
           <button onClick={joinRoom}>Join Room</button>
-        </div> :
-        <div>
-          <button onClick={leaveRoom}>Leave Room</button>
         </div>}
-
-
+      {isAdmin && readyToStart ?
+        <div>
+          <button>START</button>
+        </div> :
+        null}
     </div>
   );
 }
