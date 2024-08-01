@@ -11,13 +11,17 @@ function Home() {
   const [joinedRoom, setJoinedRoom] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [readyToStart, setReadyToStart] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
     socket.on('readyToStart', () => {
       setReadyToStart(true);
     });
 
-    socket.on('gameStarted', () => {
+    socket.on('start', () => {
+      if (!isAdmin) {
+        setIsPlaying(true);
+      }
       console.log('Game has started!');
     });
 
@@ -40,9 +44,8 @@ function Home() {
         });
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
-    console.log('did you joined a room: ' + joinedRoom)
   };
 
   const createRoom = () => {
@@ -66,6 +69,7 @@ function Home() {
           setRoom('')
           setJoinedRoom(false);
           setIsAdmin(false);
+          setIsPlaying(false);
           displaySuccess(`${username} left room: ${room}`)
         } else {
           displayError(`Failed to leave room: ${response.message}`)
@@ -74,41 +78,42 @@ function Home() {
     }
   };
 
-  const logState = () => {
-    console.log(username);
-    console.log(room);
-    console.log(joinedRoom);
-    console.log(isAdmin);
-    console.log(readyToStart);
+  const start = () => {
+    setIsPlaying(true);
+    if (isAdmin) {
+      socket.emit('start', room);
+    }
   }
-
   return (
     <div className={styles.container}>
-      <br /><br /><br /><br />
-      <input
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        placeholder="Username"
-      />
-      <input
-        value={room}
-        onChange={(e) => setRoom(e.target.value)}
-        placeholder="Room"
-      />
-      <button onClick={logState}>Log State</button>
-      {joinedRoom ?
+      {isPlaying ?
+        <button onClick={leaveRoom}>Leave</button> :
         <div>
-          <button onClick={leaveRoom}>Leave Room</button>
-        </div> :
-        <div>
-          <button onClick={createRoom}>Create Room</button>
-          <button onClick={joinRoom}>Join Room</button>
+          <br /><br /><br /><br />
+          <input
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder="Username"
+          />
+          <input
+            value={room}
+            onChange={(e) => setRoom(e.target.value)}
+            placeholder="Room"
+          />
+          {joinedRoom ?
+            <div>
+              <button onClick={leaveRoom}>Leave Room</button>
+            </div> :
+            <div>
+              <button onClick={createRoom}>Create Room</button>
+              <button onClick={joinRoom}>Join Room</button>
+            </div>}
+          {isAdmin && readyToStart ?
+            <div>
+              <button onClick={start}>START</button>
+            </div> :
+            null}
         </div>}
-      {isAdmin && readyToStart ?
-        <div>
-          <button>START</button>
-        </div> :
-        null}
     </div>
   );
 }

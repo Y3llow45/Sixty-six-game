@@ -36,6 +36,7 @@ io.on('connection', (socket) => {
         callback({ status: 'error', message: 'Room is full' });
       }
     } else {
+      callback({ status: 'error', message: 'Room is full' });
       console.log('no room data')
     }
   });
@@ -50,8 +51,8 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on('startGame', (room) => {
-    io.to(room).emit('gameStarted');
+  socket.on('start', (room) => {
+    io.to(room).emit('start');
   });
 
   socket.on('disconnect', () => {
