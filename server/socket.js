@@ -2,6 +2,8 @@ require('dotenv').config();
 const express = require('express')
 const app = express()
 const SPORT = parseInt(process.env.SPORT, 10)
+const Game = require('./game/game');
+const handleGenerateDeck = require('./game/genDeck');
 
 const server = require('http').createServer(app);
 const io = require('socket.io')(server, {
@@ -11,6 +13,7 @@ const io = require('socket.io')(server, {
   }
 });
 const rooms = {};
+const games = {};
 
 io.on('connection', (socket) => {
   console.log('A user connected:', socket.id);
@@ -52,6 +55,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('start', (room) => {
+    games[room] = new Game(room);
     io.to(room).emit('start');
   });
 

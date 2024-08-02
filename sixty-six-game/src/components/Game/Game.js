@@ -9,11 +9,12 @@ export default class Game extends Component {
     super(props);
 
     this.state = {
-      deck: [],           // cards in the deck (draw 1 every turn)
+      opponentLength: 6,
       score: [0, 0],
-      opponent: [],       // opponent's cards
+      deckLength: 12,
       player: [],         // player's cards
       trump: '',
+      deck: [],           // cards in the deck (draw 1 every turn)
       opponentHands: 0,  // points won by opponent
       playerHands: 0,    // points won by player
       opponentSelection: '',
@@ -44,28 +45,7 @@ export default class Game extends Component {
     };
   }
 
-  handleGenerateDeck = () => {
-    const shuffledDeck = generateShuffledDeck();
-    //let shuffledDeck = [10, 1, 5, 14, 4, 17, 21, 23, 19, 15, 0, 2, 18, 7, 16, 6, 8, 12, 3, 13, 11, 9, 22, 20] // test
-    console.log(shuffledDeck);
-    this.setState({
-      opponent: shuffledDeck.slice(0, 6),
-      player: shuffledDeck.slice(6, 12),
-      trump: this.state.cardMapping[shuffledDeck[12]],
-      deck: [...shuffledDeck.slice(13), shuffledDeck[12]],
-      opponentHands: 0,
-      indexOfTrump: shuffledDeck[12],
-      playerHands: 0,
-      isPlaying: true,
-      isClosed: false
-    }, () => {
-      //console.log(`OP: ${this.state.opponent}, PL: ${this.state.player}, CE: ${this.state.center}, DECK: ${this.state.deck}`)
-      //this.startGame();
-      if (!this.state.isPlayerFirst) {
-        this.opponentTurn();
-      }
-    });
-  };
+
 
   handleCardClick = (cardIndex) => {
     if (!this.state.playerCardsClickable) return;
@@ -265,23 +245,25 @@ export default class Game extends Component {
     return (
       <div className='game'>
         <Home />
+
         <div className='score'>
           <p>You : Bot</p>
           <p>{this.state.score.join(' : ')}</p>
         </div>
+
         <div className='opponent'>
-          {this.state.opponent && this.state.isPlaying ? this.state.opponent.map(a => {
+          {this.state.isPlaying ? this.state.opponentLength.map(a => {  //opponent = number of cards opponent has. 6 by default
             return <Card key={a} image={'back.png'} card={'back'} onClick={() => { return }} />
           }) : null}
         </div>
 
         <div className='center'>
           {this.state.isPlaying ?
-            this.state.player.length > 0 && this.state.deck.length > 1 ?
+            this.state.player.length > 0 && this.state.deckLength > 1 ?   //change deck.length to decklength
               <img className={this.state.isClosed ? 'closed' : 'otherCards'} src={`/cards/back.png`}></img> :
               <img className='otherCards goUnder' src='/cards/empty.png'></img> : null}
           {this.state.isPlaying ?
-            this.state.player.length > 0 && this.state.deck.length > 1 && this.state.isClosed == false ?
+            this.state.player.length > 0 && this.state.deckLength > 1 && this.state.isClosed == false ?
               <img className='trumpSuit' src={`/cards/${this.state.trump.image}`}></img> :
               <img className='otherCards goUnder' src='/cards/empty.png'></img> : null}
 
@@ -298,7 +280,7 @@ export default class Game extends Component {
 
           {this.state.playerHands > 0 &&
             this.state.isPlayerFirst == true &&
-            this.state.deck.length > 3 &&
+            this.state.deckLength > 3 &&
             this.state.isPlaying &&
             this.state.isClosed == false &&
             this.state.player.includes(this.state.specialNine[this.state.trump.suit]) ?
@@ -307,11 +289,12 @@ export default class Game extends Component {
           {this.state.isPlaying ?
             <button onClick={() => this.callEnd()}>Call 66</button> :
             null}
-          {this.state.deck.length > 3 && this.state.isPlaying && this.state.isPlayerFirst == true && this.state.isClosed == false ?
+          {this.state.deckLength > 3 && this.state.isPlaying && this.state.isPlayerFirst == true && this.state.isClosed == false ?
             <button onClick={() => this.close()}>Close Deck</button> :
             null}
 
         </div>
+
         <div className='player'>
           {this.state.isPlaying ? this.state.player.map(cardIndex => {
             const card = this.state.cardMapping[cardIndex];
