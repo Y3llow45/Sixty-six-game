@@ -3,7 +3,7 @@ const express = require('express')
 const app = express()
 const SPORT = parseInt(process.env.SPORT, 10)
 const Game = require('./game/game');
-const handleGenerateDeck = require('./game/genDeck');
+const handleGenerateDeck = require('./game/handleGenDeck');
 
 const server = require('http').createServer(app);
 const io = require('socket.io')(server, {
@@ -55,7 +55,9 @@ io.on('connection', (socket) => {
   });
 
   socket.on('start', (room) => {
-    games[room] = new Game(room);
+    var game = new Game();
+    handleGenerateDeck(game);
+    games[room] = game;
     io.to(room).emit('start');
   });
 
