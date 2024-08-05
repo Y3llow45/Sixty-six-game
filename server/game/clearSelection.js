@@ -1,27 +1,26 @@
-function clearSelection(option, playerPoints, opponentPoints) {
-  this.setState(() => {
-    const player = this.state.deck.length > 1 && !this.state.isClosed ? [...this.state.player, this.state.deck[0]] : this.state.player;
-    const opponent = this.state.deck.length > 1 && !this.state.isClosed ? [...this.state.opponent, this.state.deck[1]] : this.state.opponent;
-    return {
-      opponentSelection: '',
-      playerSelection: '',
-      isPlayerFirst: option,
-      playerHands: this.state.playerHands + playerPoints,
-      opponentHands: this.state.opponentHands + opponentPoints,
-      player: player,
-      opponent: opponent,
-      deck: this.state.deck.slice(2),
-      playerCardsClickable: true
-    }
-  }, () => {
-    if (this.state.player.length == 0 && this.state.opponent.length == 0) {
-      this.callEnd()
-    }
-    console.log(`Points: ${this.state.playerHands} vs ${this.state.opponentHands} and deck: ${this.state.deck}`)
-    if (!this.state.isPlayerFirst && this.state.opponent.length > 0) {
-      this.opponentTurn();
-    }
-  })
+const callEnd = require('./callEnd')
+
+function clearSelection(option, playerPoints, opponentPoints, deck, isClosed,) {
+  const player = deck.length > 1 && !isClosed ? [...player, deck[0]] : player;
+  const opponent = deck.length > 1 && !isClosed ? [...opponent, deck[1]] : opponent;
+
+  game.opponentSelection = '';
+  game.playerSelection = '';
+  game.isPlayerFirst = option;
+  game.playerHands = playerHands + playerPoints;
+  game.opponentHands = opponentHands + opponentPoints;
+  game.player = player;
+  game.opponent = opponent;
+  game.deck = deck.slice(2);
+  game.playerCardsClickable = true;
+
+  if (player.length == 0 && opponent.length == 0) {
+    callEnd()
+  }
+  console.log(`Points: ${playerHands} vs ${opponentHands} and deck: ${deck}`)
+  if (!option && opponent.length > 0) {
+    this.opponentTurn();
+  }
 }
 
 module.exports = clearSelection

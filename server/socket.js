@@ -59,6 +59,19 @@ io.on('connection', (socket) => {
     handleGenerateDeck(game);
     games[room] = game;
     io.to(room).emit('start');
+    console.log(JSON.stringify(games[room].trump, null, 2))
+    io.to(room).emit('trump', { trump: games[room].trump, })
+
+    const roomData = io.sockets.adapter.rooms.get(room);
+    if (roomData) {
+      const socketsInRoom = Array.from(roomData);
+
+      const playerSocket = socketsInRoom[0];
+      const opponentSocket = socketsInRoom[1];
+
+      io.to(playerSocket).emit('cards', { player: games[room].player, opponent: games[room].opponent.length });
+      io.to(opponentSocket).emit('cards', { player: games[room].opponent, opponent: games[room].player.length });
+    }
   });
 
   socket.on('disconnect', () => {
