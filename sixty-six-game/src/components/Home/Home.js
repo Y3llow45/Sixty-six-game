@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
-import io from 'socket.io-client';
+import socket from '../../services/socket';
 import styles from './Home.module.css';
 import { displaySuccess, displayError } from '../../components/Notify/Notify';
-
-const socket = io('http://localhost:5243');
 
 function Home() {
   const [username, setUsername] = useState('');
@@ -21,13 +19,13 @@ function Home() {
     socket.on('start', () => {
       if (!isAdmin) {
         setIsPlaying(true);
+        console.log('Game has started!');
       }
-      console.log('Game has started!');
     });
 
     return () => {
       socket.off('readyToStart');
-      socket.off('gameStarted');
+      socket.off('start');
     };
   }, []);
 

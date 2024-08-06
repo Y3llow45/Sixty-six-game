@@ -1,10 +1,8 @@
 import Card from './Card/Card';
 import './Game.css';
 import Home from '../Home/Home';
-import io from 'socket.io-client';
+import socket from '../../services/socket';
 import { useState, useEffect } from 'react';
-
-const socket = io('http://localhost:5243');
 
 const Game = () => {
   const [opponentLength, setOpponentLength] = useState(6);
@@ -74,8 +72,14 @@ const Game = () => {
       setTrump(data.trump);
     });
 
+    socket.on('cards', (data) => {
+      console.log('cards received');
+      console.log(data);
+    });
+
     return () => {
       socket.off('trump');
+      socket.off('cards');
     };
   }, []);
 
@@ -112,10 +116,6 @@ const Game = () => {
     this.setState({
       player: updated
     })
-  }
-
-  const logState = () => {
-    console.log(this.state);
   }
 
   const stealTrump = (card) => {
@@ -240,7 +240,6 @@ const Game = () => {
         {deckLength > 3 && isPlaying && isPlayerFirst == true && isClosed == false ?
           <button onClick={() => close()}>Close Deck</button> :
           null}
-        <button onClick={() => logState()}>Log State</button>
       </div>
 
       <div className='player'>

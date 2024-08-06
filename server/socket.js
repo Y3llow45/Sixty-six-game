@@ -61,11 +61,7 @@ io.on('connection', (socket) => {
     io.to(room).emit('start');
     console.log(JSON.stringify(games[room].trump, null, 2))
 
-    try {
-      io.to(room).emit('trump', { trump: JSON.stringify(games[room].trump, null, 2), })
-    } catch (error) {
-      console.log(error)
-    }
+    io.to(room).emit('trump', games[room].trump)
 
     const roomData = io.sockets.adapter.rooms.get(room);
     if (roomData) {
