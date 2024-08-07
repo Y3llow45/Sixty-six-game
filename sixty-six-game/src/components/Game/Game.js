@@ -66,19 +66,21 @@ const Game = () => {
 
 
   useEffect(() => {
-    socket.on('trump', (data) => {
-      console.log('trump received');
-      console.log('data:', data);
+    socket.on('init', (data) => {
       setTrump(data.trump);
+      setIndexOfTrump(data.indexOfTrump);
+      console.log('trump and index: ' + data.trump + data.indexOfTrump)
     });
 
     socket.on('cards', (data) => {
-      console.log('cards received');
-      console.log(data);
+      setPlayer(data.player);
+      setOpponentLength(data.opponent);
+      setIsPlaying(true);
+      console.log('cards: ' + data.player + data.opponent + isPlaying)
     });
 
     return () => {
-      socket.off('trump');
+      socket.off('init');
       socket.off('cards');
     };
   }, []);
@@ -192,17 +194,17 @@ const Game = () => {
   return (
     <div className='game'>
       <Home />
-      <p>Trump: {trump}</p>
-
       <div className='score'>
         <p>You : Bot</p>
         <p>{score.join(' : ')}</p>
+        <p>IsPlaying {isPlaying}</p>
       </div>
 
       <div className='opponent'>
-        {isPlaying ? opponentLength.map(a => {  //opponent = number of cards opponent has. 6 by default
-          return <Card key={a} image={'back.png'} card={'back'} onClick={() => { return }} />
-        }) : null}
+        {isPlaying ? Array.from({ length: opponentLength }, (_, index) => (
+          console.log('render opponent'),
+          <Card key={index} image={'back.png'} card={'back'} onClick={() => { }} />
+        )) : null}
       </div>
 
       <div className='center'>
@@ -243,8 +245,9 @@ const Game = () => {
       </div>
 
       <div className='player'>
-        {isPlaying ? player.map(cardIndex => {
+        {isPlaying && player.length > 0 ? player.map(cardIndex => {
           const card = cardMapping[cardIndex];
+          console.log('player map renders')
           return <Card key={cardIndex} image={card.image} card={card.card} clickable={playerCardsClickable} onClick={() => handleCardClick(cardIndex)} />
         }) : null}
       </div>
