@@ -79,6 +79,11 @@ const Game = () => {
       console.log('cards: ' + data.player + data.opponent + isPlaying)
     });
 
+    socket.on('playerCardsClickable', (arg1) => {
+      setPlayerCardsClickable(arg1);
+      console.log(`cards clickable: ${arg1}`)
+    });
+
     return () => {
       socket.off('init');
       socket.off('cards');
@@ -86,31 +91,27 @@ const Game = () => {
   }, []);
 
 
-  const handleCardClick = (cardIndex) => {
-    if (!this.state.playerCardsClickable) return;
+  const handleCardClick = async (cardIndex) => {
+    if (!playerCardsClickable) return;
 
-    if (this.state.playerHands > 0 && this.state.isPlayerFirst && this.state.mirrageCards.includes(cardIndex)) {
+    if (playerHands > 0 && isPlayerFirst && mirrageCards.includes(cardIndex)) {
       const suits = ['h', 'c', 'd', 's'];
       for (const suit of suits) {
-        if (this.state.player.includes(this.state.mirrage[suit][0]) && this.state.player.includes(this.state.mirrage[suit][1])) {
-          if (this.state.trump.suit === suit) {
+        if (player.includes(mirrage[suit][0]) && player.includes(mirrage[suit][1])) {
+          if (trump.suit === suit) {
             console.log(`40 points ${suit}`);
-            this.setState({ playerHands: this.state.playerHands + 40 })
+            setPlayerHands(playerHands + 40)
           } else {
             console.log(`20 points ${suit}`);
-            this.setState({ playerHands: this.state.playerHands + 20 })
+            setPlayerHands(playerHands + 20)
           }
           break;
         }
       }
     }
-    //console.log(this.state.player)
-    this.setState(() => ({
-      playerSelection: cardIndex,
-      playerCardsClickable: false
-    }), () => {
-      removeCard(cardIndex);
-    });
+    setPlayerSelection(cardIndex)
+    setPlayerCardsClickable(false)
+    await removeCard(cardIndex)
   };
 
   const removeCard = (cardIndex) => {
@@ -247,7 +248,6 @@ const Game = () => {
       <div className='player'>
         {isPlaying && player.length > 0 ? player.map(cardIndex => {
           const card = cardMapping[cardIndex];
-          console.log('player map renders')
           return <Card key={cardIndex} image={card.image} card={card.card} clickable={playerCardsClickable} onClick={() => handleCardClick(cardIndex)} />
         }) : null}
       </div>
