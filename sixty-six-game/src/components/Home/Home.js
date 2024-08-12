@@ -3,7 +3,7 @@ import socket from '../../services/socket';
 import styles from './Home.module.css';
 import { displaySuccess, displayError } from '../../components/Notify/Notify';
 
-function Home() {
+function Home({ sendDataToParent }) {
   const [username, setUsername] = useState('');
   const [room, setRoom] = useState('');
   const [joinedRoom, setJoinedRoom] = useState(false);
@@ -35,6 +35,7 @@ function Home() {
         socket.emit('joinRoom', { username, room }, (response) => {
           if (response.status === 'ok') {
             setJoinedRoom(true);
+            sendDataToParent(room);
             displaySuccess(`${username} joined room: ${room}`);
           } else {
             displayError('Failed to join room')
@@ -53,6 +54,7 @@ function Home() {
           displaySuccess(`${username} created room: ${room}`);
           setIsAdmin(true);
           setJoinedRoom(true);
+          sendDataToParent(room);
         } else {
           displayError(`Failed to create room: ${response.message}`);
         }

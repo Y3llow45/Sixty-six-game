@@ -70,6 +70,56 @@ io.on('connection', (socket) => {
     }
   });
 
+  socket.on('click', ({ cardIndex, room, isAdmin }) => {
+    const roomData = io.sockets.adapter.rooms.get(room);
+    var game = games[room];
+    if (roomData) {
+      const socketsInRoom = Array.from(roomData);
+      if (isAdmin) {
+        if (!game.playerCardsClickable) return;
+        const player = socketsInRoom[0]; //playerSocket
+        setPlayerSelection(cardIndex);
+        setPlayerCardsClickable(false);
+        if (game.playerHands > 0 && game.isPlayerFirst && game.mirrageCards.includes(cardIndex)) {
+          const suits = ['h', 'c', 'd', 's'];
+          for (const suit of suits) {
+            if (game.player.includes(game.mirrage[suit][0]) && game.player.includes(game.mirrage[suit][1])) {
+              if (game.trump.suit === suit) {
+                setPlayerHands(game.playerHands + 40)
+                io.to(player).emit('hands', { hands: 40 });
+              } else {
+                setPlayerHands(game.playerHands + 20)
+                io.to(player).emit('hands', { hands: 20 });
+              }
+              break;
+            }
+          }
+        }
+      } else {
+        if (!game.opponentCardsClickanle) return;
+        const opponent = socketsInRoom[1]; //opponentSocket
+        setOpponentSelection(cardIndex);
+        setOpponentCardsClickable(false);
+        if (game.opponentHands > 0 && !game.isPlayerFirst && game.mirrageCards.includes(cardIndex)) {
+          const suits = ['h', 'c', 'd', 's'];
+          for (const suit of suits) {
+            if (game.opponent.includes(game.mirrage[suit][0]) && game.opponent.includes(game.mirrage[suit][1])) {
+              if (game.trump.suit === suit) {
+                setPlayerHands(game.opponentHands + 40)
+                io.to(opponent).emit('hands', { hands: 40 });
+              } else {
+                setPlayerHands(game.opponentHands + 20)
+                io.to(opponent).emit('hands', { hands: 20 });
+              }
+              break;
+            }
+          }
+        }
+      }
+    }
+
+  });
+
   socket.on('disconnect', () => {
     console.log('A user disconnected:', socket.id);
   });

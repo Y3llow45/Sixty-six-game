@@ -19,6 +19,7 @@ const Game = () => {
   const [playerCardsClickable, setPlayerCardsClickable] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isClosed, setIsClosed] = useState(false);
+  const [room, setRoom] = useState('');
 
   const cardMapping = [
     { image: '0.png', card: 'A', suit: 'h', points: 11 },
@@ -53,15 +54,6 @@ const Game = () => {
     'd': 17,
     's': 23,
   };
-
-  const mirrage = {
-    'h': [2, 3],
-    'c': [8, 9],
-    'd': [14, 15],
-    's': [20, 21],
-  };
-
-  const mirrageCards = [2, 3, 8, 9, 14, 15, 20, 21];
   const [indexOfTrump, setIndexOfTrump] = useState(0);
 
 
@@ -93,32 +85,15 @@ const Game = () => {
 
   const handleCardClick = async (cardIndex) => {
     if (!playerCardsClickable) return;
-
-    if (playerHands > 0 && isPlayerFirst && mirrageCards.includes(cardIndex)) {
-      const suits = ['h', 'c', 'd', 's'];
-      for (const suit of suits) {
-        if (player.includes(mirrage[suit][0]) && player.includes(mirrage[suit][1])) {
-          if (trump.suit === suit) {
-            console.log(`40 points ${suit}`);
-            setPlayerHands(playerHands + 40)
-          } else {
-            console.log(`20 points ${suit}`);
-            setPlayerHands(playerHands + 20)
-          }
-          break;
-        }
-      }
-    }
     setPlayerSelection(cardIndex)
     setPlayerCardsClickable(false)
+    socket.emit('click', { cardIndex, room });
     await removeCard(cardIndex)
   };
 
   const removeCard = (cardIndex) => {
-    let updated = this.state.player.filter(num => num !== cardIndex);
-    this.setState({
-      player: updated
-    })
+    let updated = player.filter(num => num !== cardIndex);
+    setPlayer(updated);
   }
 
   const stealTrump = (card) => {
@@ -192,9 +167,13 @@ const Game = () => {
     }
   }
 
+  const setDataFromChild = (room) => {
+    setRoom(room);
+  }
+
   return (
     <div className='game'>
-      <Home />
+      <Home sendDataToParent={setDataFromChild} />
       <div className='score'>
         <p>You : Bot</p>
         <p>{score.join(' : ')}</p>
