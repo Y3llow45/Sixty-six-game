@@ -10,8 +10,6 @@ const Game = () => {
   const [deckLength, setDeckLength] = useState(12);
   const [player, setPlayer] = useState([]);
   const [trump, setTrump] = useState('trump');
-  const [deck, setDeck] = useState([]);
-  const [opponentHands, setOpponentHands] = useState(0);
   const [playerHands, setPlayerHands] = useState(0);
   const [opponentSelection, setOpponentSelection] = useState('');
   const [playerSelection, setPlayerSelection] = useState('');
@@ -20,6 +18,7 @@ const Game = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isClosed, setIsClosed] = useState(false);
   const [room, setRoom] = useState('');
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const cardMapping = [
     { image: '0.png', card: 'A', suit: 'h', points: 11 },
@@ -84,7 +83,9 @@ const Game = () => {
 
 
   const handleCardClick = async (cardIndex) => {
-    if (!playerCardsClickable) return;
+    if ((!playerCardsClickable && isAdmin) || (playerCardsClickable && !isAdmin)) {
+      return;
+    }
     setPlayerSelection(cardIndex)
     setPlayerCardsClickable(false)
     socket.emit('click', { cardIndex, room });
@@ -167,8 +168,9 @@ const Game = () => {
     }
   }
 
-  const setDataFromChild = (room) => {
+  const setDataFromChild = (room, isAdmin) => {
     setRoom(room);
+    setIsAdmin(isAdmin);
   }
 
   return (

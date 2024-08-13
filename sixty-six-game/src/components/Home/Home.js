@@ -35,7 +35,7 @@ function Home({ sendDataToParent }) {
         socket.emit('joinRoom', { username, room }, (response) => {
           if (response.status === 'ok') {
             setJoinedRoom(true);
-            sendDataToParent(room);
+            sendDataToParent(room, isAdmin);
             displaySuccess(`${username} joined room: ${room}`);
           } else {
             displayError('Failed to join room')
@@ -54,7 +54,7 @@ function Home({ sendDataToParent }) {
           displaySuccess(`${username} created room: ${room}`);
           setIsAdmin(true);
           setJoinedRoom(true);
-          sendDataToParent(room);
+          sendDataToParent(room, isAdmin);
         } else {
           displayError(`Failed to create room: ${response.message}`);
         }

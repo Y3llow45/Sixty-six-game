@@ -4,6 +4,7 @@ const app = express()
 const SPORT = parseInt(process.env.SPORT, 10)
 const Game = require('./game/game');
 const handleGenerateDeck = require('./game/handleGenDeck');
+const { cardMapping, specialNine, mirrage, mirrageCards, suits } = require('./game/data');
 
 const server = require('http').createServer(app);
 const io = require('socket.io')(server, {
@@ -14,6 +15,9 @@ const io = require('socket.io')(server, {
 });
 const rooms = {};
 const games = {};
+
+//admin = player = socketsInRoom[0]
+//notAdmin = opponent = socketsInRoom[1]
 
 io.on('connection', (socket) => {
   console.log('A user connected:', socket.id);
@@ -78,17 +82,16 @@ io.on('connection', (socket) => {
       if (isAdmin) {
         if (!game.playerCardsClickable) return;
         const player = socketsInRoom[0]; //playerSocket
-        setPlayerSelection(cardIndex);
-        setPlayerCardsClickable(false);
-        if (game.playerHands > 0 && game.isPlayerFirst && game.mirrageCards.includes(cardIndex)) {
-          const suits = ['h', 'c', 'd', 's'];
+        game.playerSelection = cardIndex;
+        game.playerCardsClickable = false;
+        if (game.playerHands > 0 && game.isPlayerFirst && mirrageCards.includes(cardIndex)) {
           for (const suit of suits) {
-            if (game.player.includes(game.mirrage[suit][0]) && game.player.includes(game.mirrage[suit][1])) {
+            if (game.player.includes(mirrage[suit][0]) && game.player.includes(mirrage[suit][1])) {
               if (game.trump.suit === suit) {
-                setPlayerHands(game.playerHands + 40)
+                game.playerHands = game.playerHands + 40;
                 io.to(player).emit('hands', { hands: 40 });
               } else {
-                setPlayerHands(game.playerHands + 20)
+                game.playerHands = game.playerHands + 20;
                 io.to(player).emit('hands', { hands: 20 });
               }
               break;
@@ -98,17 +101,16 @@ io.on('connection', (socket) => {
       } else {
         if (!game.opponentCardsClickanle) return;
         const opponent = socketsInRoom[1]; //opponentSocket
-        setOpponentSelection(cardIndex);
-        setOpponentCardsClickable(false);
-        if (game.opponentHands > 0 && !game.isPlayerFirst && game.mirrageCards.includes(cardIndex)) {
-          const suits = ['h', 'c', 'd', 's'];
+        game.opponentSelection = cardIndex;
+        game.opponentCardsClickable = false;
+        if (game.opponentHands > 0 && !game.isPlayerFirst && mirrageCards.includes(cardIndex)) {
           for (const suit of suits) {
-            if (game.opponent.includes(game.mirrage[suit][0]) && game.opponent.includes(game.mirrage[suit][1])) {
+            if (game.opponent.includes(mirrage[suit][0]) && game.opponent.includes(mirrage[suit][1])) {
               if (game.trump.suit === suit) {
-                setPlayerHands(game.opponentHands + 40)
+                game.opponentHands = game.opponentHands + 40;
                 io.to(opponent).emit('hands', { hands: 40 });
               } else {
-                setPlayerHands(game.opponentHands + 20)
+                game.opponentHands = game.opponentHands + 20;
                 io.to(opponent).emit('hands', { hands: 20 });
               }
               break;
@@ -117,7 +119,7 @@ io.on('connection', (socket) => {
         }
       }
     }
-
+    games[room] = game;
   });
 
   socket.on('disconnect', () => {
