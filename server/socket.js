@@ -4,7 +4,8 @@ const app = express()
 const SPORT = parseInt(process.env.SPORT, 10)
 const Game = require('./game/game');
 const handleGenerateDeck = require('./game/handleGenDeck');
-const { cardMapping, specialNine, mirrage, mirrageCards, suits } = require('./game/data');
+const handleCardClick = require('./game/handleCardClick');
+const compareCards = require('./game/compareCards');
 
 const server = require('http').createServer(app);
 const io = require('socket.io')(server, {
@@ -77,47 +78,23 @@ io.on('connection', (socket) => {
   socket.on('click', ({ cardIndex, room, isAdmin }) => {
     const roomData = io.sockets.adapter.rooms.get(room);
     var game = games[room];
-    if (roomData) {
-      const socketsInRoom = Array.from(roomData);
-      if (isAdmin) {
-        if (!game.playerCardsClickable) return;
-        const player = socketsInRoom[0]; //playerSocket
-        game.playerSelection = cardIndex;
-        game.playerCardsClickable = false;
-        if (game.playerHands > 0 && game.isPlayerFirst && mirrageCards.includes(cardIndex)) {
-          for (const suit of suits) {
-            if (game.player.includes(mirrage[suit][0]) && game.player.includes(mirrage[suit][1])) {
-              if (game.trump.suit === suit) {
-                game.playerHands = game.playerHands + 40;
-                io.to(player).emit('hands', { hands: 40 });
-              } else {
-                game.playerHands = game.playerHands + 20;
-                io.to(player).emit('hands', { hands: 20 });
-              }
-              break;
-            }
-          }
-        }
-      } else {
-        if (!game.opponentCardsClickanle) return;
-        const opponent = socketsInRoom[1]; //opponentSocket
-        game.opponentSelection = cardIndex;
-        game.opponentCardsClickable = false;
-        if (game.opponentHands > 0 && !game.isPlayerFirst && mirrageCards.includes(cardIndex)) {
-          for (const suit of suits) {
-            if (game.opponent.includes(mirrage[suit][0]) && game.opponent.includes(mirrage[suit][1])) {
-              if (game.trump.suit === suit) {
-                game.opponentHands = game.opponentHands + 40;
-                io.to(opponent).emit('hands', { hands: 40 });
-              } else {
-                game.opponentHands = game.opponentHands + 20;
-                io.to(opponent).emit('hands', { hands: 20 });
-              }
-              break;
-            }
-          }
-        }
-      }
+
+    if (!roomData) return;
+
+    const socketsInRoom = Array.from(roomData);
+    const playerType = isAdmin ? 'player' : 'opponent';
+    const socket = isAdmin ? socketsInRoom[0] : socketsInRoom[1];
+
+    handleCardClick(game, playerType, cardIndex, socket);
+
+    if (isAdmin) {
+      io.to(socketsInRoom[1]).emit('opponentSelection', { cardIndex: cardIndex });
+    } else {
+      io.to(socketsInRoom[0]).emit('opponentSelection', { cardIndex: cardIndex });
+    }
+
+    if (game.playerSelection !== '' && game.opponentSelection !== '') {
+      compareCards(game);
     }
     games[room] = game;
   });

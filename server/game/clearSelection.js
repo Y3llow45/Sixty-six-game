@@ -1,8 +1,8 @@
 const callEnd = require('./callEnd')
 
-function clearSelection(option, playerPoints, opponentPoints, deck, isClosed,) {
-  const player = deck.length > 1 && !isClosed ? [...player, deck[0]] : player;
-  const opponent = deck.length > 1 && !isClosed ? [...opponent, deck[1]] : opponent;
+function clearSelection(option, playerPoints, opponentPoints, game) {
+  const player = game.deck.length > 1 && !game.isClosed ? [...player, game.deck[0]] : player;
+  const opponent = game.deck.length > 1 && !game.isClosed ? [...opponent, game.deck[1]] : opponent;
 
   game.opponentSelection = '';
   game.playerSelection = '';
@@ -18,9 +18,6 @@ function clearSelection(option, playerPoints, opponentPoints, deck, isClosed,) {
     callEnd()
   }
   console.log(`Points: ${playerHands} vs ${opponentHands} and deck: ${deck}`)
-  if (!option && opponent.length > 0) {
-    this.opponentTurn();
-  }
 }
 
 module.exports = clearSelection
