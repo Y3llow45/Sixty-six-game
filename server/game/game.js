@@ -14,6 +14,7 @@ class Game {
     this.opponentCardsClickable = false;
     this.indexOfTrump = 0;
     this.isPlaying = false
+    this.room;
   }
 }
 

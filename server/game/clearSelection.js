@@ -1,4 +1,5 @@
-const callEnd = require('./callEnd')
+const callEnd = require('./callEnd');
+const sendCards = require('./services/sendCards');
 
 function clearSelection(option, playerPoints, opponentPoints, game) {
   const player = game.deck.length > 1 && !game.isClosed ? [...player, game.deck[0]] : player;
@@ -17,6 +18,7 @@ function clearSelection(option, playerPoints, opponentPoints, game) {
   if (player.length == 0 && opponent.length == 0) {
     callEnd()
   }
+  sendCards(room, game)
   console.log(`Points: ${playerHands} vs ${opponentHands} and deck: ${deck}`)
 }
 

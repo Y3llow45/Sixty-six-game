@@ -6,6 +6,7 @@ const Game = require('./game/game');
 const handleGenerateDeck = require('./game/handleGenDeck');
 const handleCardClick = require('./game/handleCardClick');
 const compareCards = require('./game/compareCards');
+const sendCards = require('./services/sendCards');
 
 const server = require('http').createServer(app);
 const io = require('socket.io')(server, {
@@ -61,18 +62,11 @@ io.on('connection', (socket) => {
 
   socket.on('start', (room) => {
     var game = new Game();
-    handleGenerateDeck(game);
+    handleGenerateDeck(game, room);
     games[room] = game;
     io.to(room).emit('start');
     io.to(room).emit('init', { trump: games[room].trump, indexOfTrump: games[room].indexOfTrump })
-    const roomData = io.sockets.adapter.rooms.get(room);
-    if (roomData) {
-      const socketsInRoom = Array.from(roomData);
-      const playerSocket = socketsInRoom[0];
-      const opponentSocket = socketsInRoom[1];
-      io.to(playerSocket).emit('cards', { player: games[room].player, opponent: games[room].opponent.length });
-      io.to(opponentSocket).emit('cards', { player: games[room].opponent, opponent: games[room].player.length });
-    }
+    sendCards(io, room, games[room]);
   });
 
   socket.on('click', ({ cardIndex, room, isAdmin }) => {
@@ -107,3 +101,5 @@ io.on('connection', (socket) => {
 server.listen(SPORT, () => {
   console.log(`Socket.io server is listening on port: ${SPORT}`)
 })
+
+module.exports = io;
