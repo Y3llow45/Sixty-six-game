@@ -66,7 +66,7 @@ io.on('connection', (socket) => {
     games[room] = game;
     io.to(room).emit('start');
     io.to(room).emit('init', { trump: games[room].trump, indexOfTrump: games[room].indexOfTrump })
-    sendCards(io, room, games[room]);
+    sendCards(games[room]);
   });
 
   socket.on('click', ({ cardIndex, room, isAdmin }) => {

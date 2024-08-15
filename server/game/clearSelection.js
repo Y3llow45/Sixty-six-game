@@ -1,5 +1,5 @@
 const callEnd = require('./callEnd');
-const sendCards = require('./services/sendCards');
+const sendCards = require('../services/sendCards');
 
 function clearSelection(option, playerPoints, opponentPoints, game) {
   const player = game.deck.length > 1 && !game.isClosed ? [...player, game.deck[0]] : player;

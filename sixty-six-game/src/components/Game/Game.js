@@ -60,13 +60,13 @@ const Game = () => {
     socket.on('init', (data) => {
       setTrump(data.trump);
       setIndexOfTrump(data.indexOfTrump);
+      setIsPlaying(true);
       console.log('trump and index: ' + data.trump + data.indexOfTrump)
     });
 
     socket.on('cards', (data) => {
       setPlayer(data.player);
       setOpponentLength(data.opponent);
-      setIsPlaying(true);
       console.log('cards: ' + data.player + data.opponent + isPlaying)
     });
 

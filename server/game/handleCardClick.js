@@ -1,4 +1,4 @@
-const { mirrage, suits } = require('./game/data');
+const { mirrage, suits } = require('./data');
 
 function handleCardClick() {
   if (!game[`${playerType}CardsClickable`]) return;

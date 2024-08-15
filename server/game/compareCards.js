@@ -1,5 +1,5 @@
 const clearSelection = require('./clearSelection')
-const { cardMapping } = require('./game/data');
+const { cardMapping } = require('./data');
 
 function compareCards(game) {
   let opponent = cardMapping[game.opponentSelection];

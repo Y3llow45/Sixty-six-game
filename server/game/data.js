@@ -19,4 +19,4 @@ const mirrage = {            // Call 20 or 40
 const mirrageCards = [2, 3, 8, 9, 14, 15, 20, 21];
 const suits = ['h', 'c', 'd', 's'];
 
-export { cardMapping, specialNine, mirrage, mirrageCards, suits }
+module.exports = { cardMapping, specialNine, mirrage, mirrageCards, suits };
