@@ -1,6 +1,6 @@
 const { mirrage, suits } = require('./data');
 
-function handleCardClick() {
+function handleCardClick(game, playerType, cardIndex, socket) {
   if (!game[`${playerType}CardsClickable`]) return;
 
   game[`${playerType}Selection`] = cardIndex;

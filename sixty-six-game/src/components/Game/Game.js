@@ -14,7 +14,7 @@ const Game = () => {
   const [opponentSelection, setOpponentSelection] = useState('');
   const [playerSelection, setPlayerSelection] = useState('');
   const [isPlayerFirst, setIsPlayerFirst] = useState(true);
-  const [playerCardsClickable, setPlayerCardsClickable] = useState(true);
+  const [playerCardsClickable, setPlayerCardsClickable] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isClosed, setIsClosed] = useState(false);
   const [room, setRoom] = useState('');
@@ -75,9 +75,16 @@ const Game = () => {
       console.log(`cards clickable: ${arg1}`)
     });
 
+    socket.on('opponentSelection', (arg1) => {
+      setOpponentSelection(arg1);
+      console.log(`opponent selection: ${arg1}`)
+    });
+
     return () => {
       socket.off('init');
       socket.off('cards');
+      socket.off('playerCardsClickable');
+      socket.off('opponentSelection');
     };
   }, []);
 
@@ -184,7 +191,6 @@ const Game = () => {
 
       <div className='opponent'>
         {isPlaying ? Array.from({ length: opponentLength }, (_, index) => (
-          console.log('render opponent'),
           <Card key={index} image={'back.png'} card={'back'} onClick={() => { }} />
         )) : null}
       </div>

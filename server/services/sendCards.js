@@ -1,6 +1,7 @@
-const io = require('../socket');
+
 
 function sendCards(game) {
+  console.log(game.room);
   const roomData = io.sockets.adapter.rooms.get(game.room);
   if (roomData) {
     const socketsInRoom = Array.from(roomData);
