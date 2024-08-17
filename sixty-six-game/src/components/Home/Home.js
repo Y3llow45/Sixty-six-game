@@ -35,7 +35,7 @@ function Home({ sendDataToParent }) {
         socket.emit('joinRoom', { username, room }, (response) => {
           if (response.status === 'ok') {
             setJoinedRoom(true);
-            sendDataToParent(room, isAdmin);
+            sendDataToParent(room, false);
             displaySuccess(`${username} joined room: ${room}`);
           } else {
             displayError('Failed to join room')
@@ -51,9 +51,9 @@ function Home({ sendDataToParent }) {
     if (username && room) {
       socket.emit('createRoom', { username, room }, (response) => {
         if (response.status === 'ok') {
-          sendDataToParent(room, isAdmin);
-          displaySuccess(`${username} created room: ${room}`);
           setIsAdmin(true);
+          sendDataToParent(room, true);
+          displaySuccess(`${username} created room: ${room}`);
           setJoinedRoom(true);
         } else {
           displayError(`Failed to create room: ${response.message}`);
@@ -81,7 +81,7 @@ function Home({ sendDataToParent }) {
   const start = () => {
     setIsPlaying(true);
     if (isAdmin) {
-      socket.emit('start', room);
+      socket.emit('start', room, isAdmin);
     }
   }
   return (

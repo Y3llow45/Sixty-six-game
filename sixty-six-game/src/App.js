@@ -6,8 +6,6 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Test from './components/Test/Test';
 import Login from './components/Login/Login';
-import Home from './components/Home/Home';
-
 
 function App() {
   return (
@@ -27,8 +25,7 @@ function App() {
           theme="light"
         />
         <Routes>
-          <Route path='/' exact element={<Home />} />
-          <Route path='/game' element={<Game />} />
+          <Route path='/' element={<Game />} />
           <Route path='/register' element={<Register />} />
           <Route path='/test' element={<Test />} />
           <Route path='/login' element={<Login />} />

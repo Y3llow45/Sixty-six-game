@@ -18,7 +18,7 @@ const Game = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isClosed, setIsClosed] = useState(false);
   const [room, setRoom] = useState('');
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [isAdmin, setIsAdmin] = useState();
 
   const cardMapping = [
     { image: '0.png', card: 'A', suit: 'h', points: 11 },
@@ -61,6 +61,7 @@ const Game = () => {
       setTrump(data.trump);
       setIndexOfTrump(data.indexOfTrump);
       setIsPlaying(true);
+      console.log(`isAdmin: ${isAdmin}`)
       console.log('trump and index: ' + data.trump + data.indexOfTrump)
     });
 
@@ -90,12 +91,13 @@ const Game = () => {
 
 
   const handleCardClick = async (cardIndex) => {
-    if ((!playerCardsClickable && isAdmin) || (playerCardsClickable && !isAdmin)) {
+    console.log(`Player cards clickable and isAdmin: ${playerCardsClickable} and ${isAdmin}`)
+    if (!playerCardsClickable) {
       return;
     }
     setPlayerSelection(cardIndex)
     setPlayerCardsClickable(false)
-    socket.emit('click', { cardIndex, room });
+    socket.emit('click', { cardIndex, room, isAdmin });
     await removeCard(cardIndex)
   };
 
@@ -178,6 +180,7 @@ const Game = () => {
   const setDataFromChild = (room, isAdmin) => {
     setRoom(room);
     setIsAdmin(isAdmin);
+    console.log(`send data from child: ${room}, ${isAdmin}`)
   }
 
   return (

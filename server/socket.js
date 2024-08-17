@@ -88,14 +88,15 @@ io.on('connection', (socket) => {
     handleCardClick(game, playerType, cardIndex, socket);
 
     if (isAdmin) {
-      io.to(socketsInRoom[0]).emit('opponentSelection', cardIndex);
-      io.to(socketsInRoom[0]).emit('playerCardsClickable', true);
-    } else {
       io.to(socketsInRoom[1]).emit('opponentSelection', cardIndex);
       io.to(socketsInRoom[1]).emit('playerCardsClickable', true);
+    } else {
+      io.to(socketsInRoom[0]).emit('opponentSelection', cardIndex);
+      io.to(socketsInRoom[0]).emit('playerCardsClickable', true);
     }
 
     if (game.playerSelection !== '' && game.opponentSelection !== '') {
+      console.log('compare them!')
       compareCards(game);
     }
     games[room] = game;
