@@ -16,7 +16,7 @@ function handleCardClick(game, playerType, cardIndex, socket) {
   if (game[`${playerType}Hands`] > 0 && shouldCheckMirage(game, playerType)) {
     const handsWon = calculateHands(game, playerType, cardIndex);
     game[`${playerType}Hands`] += handsWon;
-    io.to(socket).emit('hands', { hands: handsWon });
+    io.to(socket).emit('hands', handsWon);
   }
 }
 

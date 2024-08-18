@@ -66,9 +66,11 @@ const Game = () => {
     });
 
     socket.on('cards', (data) => {
+      console.log('cards: ' + data.player + data.opponent + isPlaying)
       setPlayer(data.player);
       setOpponentLength(data.opponent);
-      console.log('cards: ' + data.player + data.opponent + isPlaying)
+      setOpponentSelection('');
+      setPlayerSelection('');
     });
 
     socket.on('playerCardsClickable', (arg1) => {
@@ -81,6 +83,11 @@ const Game = () => {
       console.log(`opponent selection: ${arg1}`)
     });
 
+    socket.on('hands', (points) => {
+      setPlayerHands(playerHands + points);
+      console.log(playerHands);
+    });
+
     return () => {
       socket.off('init');
       socket.off('cards');
@@ -90,21 +97,16 @@ const Game = () => {
   }, []);
 
 
-  const handleCardClick = async (cardIndex) => {
+  const handleCardClick = (cardIndex) => {
     console.log(`Player cards clickable and isAdmin: ${playerCardsClickable} and ${isAdmin}`)
     if (!playerCardsClickable) {
       return;
     }
     setPlayerSelection(cardIndex)
     setPlayerCardsClickable(false)
+    remove(cardIndex);
     socket.emit('click', { cardIndex, room, isAdmin });
-    await removeCard(cardIndex)
   };
-
-  const removeCard = (cardIndex) => {
-    let updated = player.filter(num => num !== cardIndex);
-    setPlayer(updated);
-  }
 
   const stealTrump = (card) => {
     const index = this.state.player.indexOf(card);
@@ -181,6 +183,11 @@ const Game = () => {
     setRoom(room);
     setIsAdmin(isAdmin);
     console.log(`send data from child: ${room}, ${isAdmin}`)
+  }
+
+  const remove = (cardIndex) => {
+    let updated = player.filter(num => num !== cardIndex);
+    setPlayer(updated);
   }
 
   return (
