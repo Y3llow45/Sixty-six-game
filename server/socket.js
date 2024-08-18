@@ -95,6 +95,7 @@ io.on('connection', (socket) => {
       io.to(socketsInRoom[0]).emit('playerCardsClickable', true);
     }
 
+    console.log(`${game.playerSelection} and ${game.opponentSelection}`)
     if (game.playerSelection !== '' && game.opponentSelection !== '') {
       console.log('compare them!')
       compareCards(game);

@@ -1,10 +1,17 @@
 const { mirrage, suits } = require('./data');
 
 function handleCardClick(game, playerType, cardIndex, socket) {
+  console.log(game[`${playerType}CardsClickable`]);
   if (!game[`${playerType}CardsClickable`]) return;
 
   game[`${playerType}Selection`] = cardIndex;
-  game[`${playerType}CardsClickable`] = false;
+  if (playerType == 'player') {
+    game['opponentCardsClickable'] = true;
+    game['playerCardsClickable'] = false;
+  } else {
+    game['playerCardsClickable'] = true;
+    game['opponentCardsClickable'] = false;
+  }
 
   if (game[`${playerType}Hands`] > 0 && shouldCheckMirage(game, playerType)) {
     const handsWon = calculateHands(game, playerType, cardIndex);
