@@ -22,7 +22,6 @@ function clearSelection(option, playerPoints, opponentPoints, game) {
     console.log('call end')
     callEnd()
   }
-  console.log(player);
   sendCards(game)
   console.log(`Points: ${game.playerHands} vs ${game.opponentHands} and deck: ${game.deck}`)
 }

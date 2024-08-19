@@ -85,20 +85,17 @@ io.on('connection', (socket) => {
     const playerType = isAdmin ? 'player' : 'opponent';
     const socket = isAdmin ? socketsInRoom[0] : socketsInRoom[1];
 
-    handleCardClick(game, playerType, cardIndex, socket);
-
-    if (isAdmin) {
-      io.to(socketsInRoom[1]).emit('opponentSelection', cardIndex);
-      io.to(socketsInRoom[1]).emit('playerCardsClickable', true);
-    } else {
-      io.to(socketsInRoom[0]).emit('opponentSelection', cardIndex);
-      io.to(socketsInRoom[0]).emit('playerCardsClickable', true);
-    }
-
-    console.log(`${game.playerSelection} and ${game.opponentSelection}`)
     if (game.playerSelection !== '' && game.opponentSelection !== '') {
-      console.log('compare them!')
+      console.log('compare cards!')
       compareCards(game);
+    } else {
+      console.log('handle card click' + cardIndex)
+      handleCardClick(game, playerType, cardIndex, socket);
+      if (isAdmin) {
+        io.to(socketsInRoom[1]).emit('opponentSelection', cardIndex);
+      } else {
+        io.to(socketsInRoom[0]).emit('opponentSelection', cardIndex);
+      }
     }
     games[room] = game;
   });

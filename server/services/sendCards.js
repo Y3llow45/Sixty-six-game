@@ -6,6 +6,13 @@ function sendCards(game) {
     const opponentSocket = socketsInRoom[1];
     io.to(playerSocket).emit('cards', { player: game.player, opponent: game.opponent.length });
     io.to(opponentSocket).emit('cards', { player: game.opponent, opponent: game.player.length });
+    if (game.isPlayerFirst) {
+      io.to(playerSocket).emit('playerCardsClickable', true);
+      io.to(opponentSocket).emit('playerCardsClickable', false);
+    } else {
+      io.to(opponentSocket).emit('playerCardsClickable', true);
+      io.to(playerSocket).emit('playerCardsClickable', false);
+    }
     console.log(game.player);
   }
 }
