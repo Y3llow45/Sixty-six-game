@@ -83,11 +83,22 @@ const Game = () => {
       console.log(playerHands);
     });
 
+    socket.on('deckLength', (arg1) => {
+      setDeckLength(arg1);
+    })
+
+    socket.on('end', (arg1) => {
+      setScore(arg1);
+    })
+
     return () => {
       socket.off('init');
       socket.off('cards');
       socket.off('playerCardsClickable');
       socket.off('opponentSelection');
+      socket.off('hands');
+      socket.off('deckLength');
+      socket.off('end');
     };
   }, []);
 
