@@ -88,6 +88,7 @@ const Game = () => {
     })
 
     socket.on('end', (arg1) => {
+      console.log(`score: ${arg1} and type: ${typeof (arg1)}`);
       setScore(arg1);
     })
 
@@ -200,7 +201,7 @@ const Game = () => {
       <Home sendDataToParent={setDataFromChild} />
       <div className='score'>
         <p>You : Bot</p>
-        <p>{score.join(' : ')}</p>
+        <p>{score}</p>
         <p>IsPlaying {isPlaying}</p>
       </div>
 
