@@ -13,7 +13,6 @@ function sendCards(game) {
       io.to(opponentSocket).emit('playerCardsClickable', true);
       io.to(playerSocket).emit('playerCardsClickable', false);
     }
-    console.log(game.player);
   }
 }
 

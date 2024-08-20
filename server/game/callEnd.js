@@ -21,7 +21,7 @@ function callEnd(game) {
       points = 1;
     }
     game.isPlayerFirst = true;
-    game.score = [prevState.score[0] + points, prevState.score[1]];
+    game.score = [game.score[0] + points, game.score[1]];
   } else {
     let points;
     if (game.playerHands == 0) {
@@ -35,7 +35,7 @@ function callEnd(game) {
       points = 1;
     }
     game.isPlayerFirst = false;
-    game.score = [prevState.score[0], prevState.score[1] + points]
+    game.score = [game.score[0], game.score[1] + points]
   }
   game.opponentHands = 0;
   game.playerHands = 0;

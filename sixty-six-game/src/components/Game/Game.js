@@ -61,12 +61,9 @@ const Game = () => {
       setTrump(data.trump);
       setIndexOfTrump(data.indexOfTrump);
       setIsPlaying(true);
-      console.log(`isAdmin: ${isAdmin}`)
-      console.log('trump and index: ' + data.trump + data.indexOfTrump)
     });
 
     socket.on('cards', (data) => {
-      console.log('cards: ' + data.player + data.opponent + isPlaying)
       setPlayer(data.player);
       setOpponentLength(data.opponent);
       setOpponentSelection('');
@@ -75,12 +72,10 @@ const Game = () => {
 
     socket.on('playerCardsClickable', (arg1) => {
       setPlayerCardsClickable(arg1);
-      console.log(`cards clickable: ${arg1}`)
     });
 
     socket.on('opponentSelection', (arg1) => {
       setOpponentSelection(arg1);
-      console.log(`opponent selection: ${arg1}`)
     });
 
     socket.on('hands', (points) => {
@@ -98,7 +93,6 @@ const Game = () => {
 
 
   const handleCardClick = (cardIndex) => {
-    console.log(`Player cards clickable and isAdmin: ${playerCardsClickable} and ${isAdmin}`)
     if (!playerCardsClickable) {
       return;
     }
