@@ -3,7 +3,7 @@ import socket from '../../services/socket';
 import styles from './Home.module.css';
 import { displaySuccess, displayError } from '../../components/Notify/Notify';
 
-const Home = forwardRef(({ sendDataToParent }, ref) => {
+const Home = forwardRef(({ sendDataToParent, cleanOnLeave }, ref) => {
   const [username, setUsername] = useState('');
   const [room, setRoom] = useState('');
   const [joinedRoom, setJoinedRoom] = useState(false);
@@ -66,6 +66,7 @@ const Home = forwardRef(({ sendDataToParent }, ref) => {
     if (username && room) {
       socket.emit('leaveRoom', { username, room }, (response) => {
         if (response.status === 'ok') {
+          cleanOnLeave();
           setRoom('')
           setJoinedRoom(false);
           setIsAdmin(false);

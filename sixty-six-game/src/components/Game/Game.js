@@ -108,6 +108,23 @@ const Game = () => {
     };
   }, []);
 
+  const cleanOnLeave = () => {
+    setOpponentLength(6);
+    setScore([0, 0]);
+    setDeckLength(12);
+    setPlayer([]);
+    setTrump('trump');
+    setPlayerHands(0);
+    setOpponentSelection('');
+    setPlayerSelection('');
+    setIsPlayerFirst(true);
+    setPlayerCardsClickable(false);
+    setIsPlaying(false);
+    setIsClosed(false);
+    setRoom('');
+    setIsAdmin(false);
+    setShowRestart(false);
+  }
 
   const handleCardClick = (cardIndex) => {
     if (!playerCardsClickable) {
@@ -166,7 +183,7 @@ const Game = () => {
 
   return (
     <div className='game'>
-      <Home ref={homeRef} sendDataToParent={setDataFromChild} />
+      <Home ref={homeRef} sendDataToParent={setDataFromChild} cleanOnLeave={cleanOnLeave} />
       <div className='score'>
         <p>You : Opponent</p>
         <p>{isAdmin ? score.join(' - ') : score.slice().reverse().join(' - ')}</p>
