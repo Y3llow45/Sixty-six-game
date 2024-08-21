@@ -19,6 +19,7 @@ const Game = () => {
   const [isClosed, setIsClosed] = useState(false);
   const [room, setRoom] = useState('');
   const [isAdmin, setIsAdmin] = useState();
+  const [showRestart, setShowRestart] = useState(false);
 
   const homeRef = useRef();
 
@@ -93,6 +94,7 @@ const Game = () => {
       console.log(`score: ${arg1} and type: ${typeof (arg1)}`);
       setIsPlaying(false);
       setScore(arg1);
+      setShowRestart(true);
     })
 
     return () => {
@@ -140,52 +142,7 @@ const Game = () => {
   }
 
   const callEnd = () => {
-    this.setState({
-      isPlaying: false,
-      deck: [],
-      opponent: [],
-      player: [],
-      trump: '',
-      opponentHands: 0,
-      playerHands: 0,
-      opponentSelection: '',
-      playerSelection: '',
-      playerCardsClickable: true,
-      isClosed: false
-    });
-    if (this.state.playerHands >= 66) {
-      let points;
-      if (this.state.opponentHands == 0) {
-        console.log('3 points for player')
-        points = 3;
-      } else if (this.state.opponentHands < 33) {
-        console.log('2 points for player')
-        points = 2;
-      } else {
-        console.log('1 points for player')
-        points = 1;
-      }
-      this.setState(prevState => ({
-        isPlayerFirst: true,
-        score: [prevState.score[0] + points, prevState.score[1]]
-      }));
-    } else {
-      let points;
-      if (this.state.playerHands == 0) {
-        console.log('3 points for opponent')
-        points = 3;
-      } else if (this.state.opponentHands < 33) {
-        console.log('2 points for opponent')
-        points = 2;
-      } else {
-        console.log('1 points for opponent')
-        points = 1;
-      }
-      this.setState(prevState => ({
-        isPlayerFirst: false,
-        score: [prevState.score[0], prevState.score[1] + points]
-      }));
-    }
+
   }
 
   const setDataFromChild = (room, isAdmin) => {
@@ -199,11 +156,12 @@ const Game = () => {
     setPlayer(updated);
   }
 
-  const testRestart = () => {
-    setIsPlaying(false)
+  const newGame = () => {
+    setIsPlaying(true)
     if (homeRef.current) {
       homeRef.current.start();
     }
+    setShowRestart(false);
   }
 
   return (
@@ -257,7 +215,9 @@ const Game = () => {
           null}
       </div>
 
-      <button onClick={() => testRestart()}>TEST RESTART</button>
+      {showRestart ?
+        <button onClick={() => newGame()}>New game</button> : null
+      }
 
       <div className='player'>
         {isPlaying && player.length > 0 ? player.map(cardIndex => {
