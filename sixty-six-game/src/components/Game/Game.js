@@ -2,7 +2,7 @@ import Card from './Card/Card';
 import './Game.css';
 import Home from '../Home/Home';
 import socket from '../../services/socket';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 const Game = () => {
   const [opponentLength, setOpponentLength] = useState(6);
@@ -19,6 +19,8 @@ const Game = () => {
   const [isClosed, setIsClosed] = useState(false);
   const [room, setRoom] = useState('');
   const [isAdmin, setIsAdmin] = useState();
+
+  const homeRef = useRef();
 
   const cardMapping = [
     { image: '0.png', card: 'A', suit: 'h', points: 11 },
@@ -89,6 +91,7 @@ const Game = () => {
 
     socket.on('end', (arg1) => {
       console.log(`score: ${arg1} and type: ${typeof (arg1)}`);
+      setIsPlaying(false);
       setScore(arg1);
     })
 
@@ -196,13 +199,19 @@ const Game = () => {
     setPlayer(updated);
   }
 
+  const testRestart = () => {
+    setIsPlaying(false)
+    if (homeRef.current) {
+      homeRef.current.start();
+    }
+  }
+
   return (
     <div className='game'>
-      <Home sendDataToParent={setDataFromChild} />
+      <Home ref={homeRef} sendDataToParent={setDataFromChild} />
       <div className='score'>
-        <p>You : Bot</p>
-        <p>{score}</p>
-        <p>IsPlaying {isPlaying}</p>
+        <p>You : Opponent</p>
+        <p>{isAdmin ? score.join(' - ') : score.slice().reverse().join(' - ')}</p>
       </div>
 
       <div className='opponent'>
@@ -247,6 +256,8 @@ const Game = () => {
           <button onClick={() => close()}>Close Deck</button> :
           null}
       </div>
+
+      <button onClick={() => testRestart()}>TEST RESTART</button>
 
       <div className='player'>
         {isPlaying && player.length > 0 ? player.map(cardIndex => {

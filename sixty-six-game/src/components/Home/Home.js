@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
 import socket from '../../services/socket';
 import styles from './Home.module.css';
 import { displaySuccess, displayError } from '../../components/Notify/Notify';
 
-function Home({ sendDataToParent }) {
+const Home = forwardRef(({ sendDataToParent }, ref) => {
   const [username, setUsername] = useState('');
   const [room, setRoom] = useState('');
   const [joinedRoom, setJoinedRoom] = useState(false);
@@ -84,6 +84,11 @@ function Home({ sendDataToParent }) {
       socket.emit('start', room, isAdmin);
     }
   }
+
+  useImperativeHandle(ref, () => ({
+    start,
+  }));
+
   return (
     <div className={styles.container}>
       {isPlaying ?
@@ -116,6 +121,6 @@ function Home({ sendDataToParent }) {
         </div>}
     </div>
   );
-}
+})
 
 export default Home;

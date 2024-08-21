@@ -29,7 +29,7 @@ function clearSelection(option, playerPoints, opponentPoints, game) {
   if (player.length == 0 && opponent.length == 0) {
     console.log('call end');
     callEnd(game);
-    io.to(game.room).emit('end', { score: game.score });
+    io.to(game.room).emit('end', game.score);
   }
   sendCards(game);
   console.log(`Points: ${game.playerHands} vs ${game.opponentHands} and deck: ${game.deck}`)
