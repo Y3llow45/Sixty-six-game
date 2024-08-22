@@ -137,15 +137,7 @@ const Game = () => {
   };
 
   const stealTrump = (card) => {
-    const index = this.state.player.indexOf(card);
-    const newPlayer = [...this.state.player];
-    newPlayer.splice(index, 1);
-    newPlayer.push(this.state.indexOfTrump);
-    const newTrump = this.state.cardMapping[card];
-    this.setState(() => ({
-      player: newPlayer,
-      trump: newTrump
-    }));
+    socket.emit('stealTrump', { card, room, isAdmin });
   }
 
   const close = () => {

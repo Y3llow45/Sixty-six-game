@@ -7,6 +7,7 @@ const handleGenerateDeck = require('./game/handleGenDeck');
 const handleCardClick = require('./game/handleCardClick');
 const compareCards = require('./game/compareCards');
 const sendCards = require('./services/sendCards');
+const stealTrump = require('./game/stealTrump');
 
 const server = require('http').createServer(app);
 global.io = require('socket.io')(server, {
@@ -85,6 +86,31 @@ io.on('connection', (socket) => {
     const playerType = isAdmin ? 'player' : 'opponent';
     const socket = isAdmin ? socketsInRoom[0] : socketsInRoom[1];
     handleCardClick(game, playerType, cardIndex, socket);
+    if (isAdmin) {
+      io.to(socketsInRoom[1]).emit('opponentSelection', cardIndex);
+      io.to(socketsInRoom[1]).emit('playerCardsClickable', true);
+    } else {
+      io.to(socketsInRoom[0]).emit('opponentSelection', cardIndex);
+      io.to(socketsInRoom[0]).emit('playerCardsClickable', true);
+    }
+    if (game.playerSelection !== '' && game.opponentSelection !== '') {
+      compareCards(game);
+    }
+    games[room] = game;
+  });
+
+  socket.on('stealTrump', ({ card, room, isAdmin }) => {
+    const roomData = io.sockets.adapter.rooms.get(room);
+    var game = games[room];
+
+    if (!roomData) return;
+
+    const socketsInRoom = Array.from(roomData);
+    const playerType = isAdmin ? game.player : game.opponent;
+    const socket = isAdmin ? socketsInRoom[0] : socketsInRoom[1];
+
+    stealTrump(game, playerType, card, isAdmin, socket);
+
     if (isAdmin) {
       io.to(socketsInRoom[1]).emit('opponentSelection', cardIndex);
       io.to(socketsInRoom[1]).emit('playerCardsClickable', true);
