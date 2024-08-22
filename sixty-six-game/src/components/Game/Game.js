@@ -56,13 +56,11 @@ const Game = () => {
     'd': 17,
     's': 23,
   };
-  const [indexOfTrump, setIndexOfTrump] = useState(0);
-
 
   useEffect(() => {
-    socket.on('init', (data) => {
+    socket.on('setTrump', (data) => {
+      console.log(data.trump)
       setTrump(data.trump);
-      setIndexOfTrump(data.indexOfTrump);
       setIsPlaying(true);
     });
 
@@ -83,7 +81,6 @@ const Game = () => {
 
     socket.on('hands', (points) => {
       setPlayerHands(playerHands + points);
-      console.log(playerHands);
     });
 
     socket.on('deckLength', (arg1) => {
@@ -95,6 +92,10 @@ const Game = () => {
       setIsPlaying(false);
       setScore(arg1);
       setShowRestart(true);
+      setOpponentLength(0);
+      setPlayerSelection('');
+      setOpponentSelection('');
+      setPlayer([]);
     })
 
     return () => {
@@ -141,17 +142,13 @@ const Game = () => {
   }
 
   const close = () => {
-    this.setState(() => {
-      return {
-        isClosed: true
-      }
-    }, () => {
-      console.log(`closed!`)
-    })
+    setIsClosed(true);
+    socket.emit('close', { room, isAdmin });
   }
 
   const callEnd = () => {
-
+    setIsPlaying(false);
+    socket.emit('callEnd', { room, isAdmin });
   }
 
   const setDataFromChild = (room, isAdmin) => {
@@ -224,7 +221,7 @@ const Game = () => {
           null}
       </div>
 
-      {showRestart ?
+      {showRestart && isAdmin ?
         <button onClick={() => newGame()}>New game</button> : null
       }
 

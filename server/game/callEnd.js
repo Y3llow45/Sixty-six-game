@@ -6,7 +6,6 @@ function callEnd(game) {
   game.trump = '';
   game.opponentSelection = '';
   game.playerSelection = '';
-  game.playerCardsClickable = true;
   game.isClosed = false;
   if (game.playerHands >= 66) {
     let points;
@@ -21,6 +20,8 @@ function callEnd(game) {
       points = 1;
     }
     game.isPlayerFirst = true;
+    game.playerCardsClickable = true;
+    game.opponentHandsClickable = false;
     game.score = [game.score[0] + points, game.score[1]];
   } else {
     let points;
@@ -35,6 +36,8 @@ function callEnd(game) {
       points = 1;
     }
     game.isPlayerFirst = false;
+    game.playerCardsClickable = false;
+    game.opponentHandsClickable = true;
     game.score = [game.score[0], game.score[1] + points]
   }
   game.opponentHands = 0;

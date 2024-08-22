@@ -1,6 +1,6 @@
-import { cardMapping } from "./data";
+const { cardMapping } = require('./data');
 
-function stealTrump(game, playerType, card, isAdmin, socket) {
+function stealTrump(game, playerType, card, socket) {
   const index = playerType.indexOf(card);
   const newPlayer = [...playerType];
   newPlayer.splice(index, 1);
@@ -11,6 +11,7 @@ function stealTrump(game, playerType, card, isAdmin, socket) {
   game.trump = newTrump;
 
   io.to(socket).emit('cards', { player: game.player, opponent: game.opponent.length });
+  io.to(game.room).emit('setTrump', { trump: games[room].trump, indexOfTrump: games[room].indexOfTrump })
 }
 
 module.exports = stealTrump;
