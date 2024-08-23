@@ -80,7 +80,6 @@ const Home = forwardRef(({ sendDataToParent, cleanOnLeave }, ref) => {
   };
 
   const start = () => {
-    setIsPlaying(true);
     if (isAdmin) {
       socket.emit('start', room, isAdmin);
     }

@@ -19,6 +19,7 @@ global.io = require('socket.io')(server, {
 });
 const rooms = {};
 const games = {};
+global.score = {};
 
 //admin = player = socketsInRoom[0]
 //notAdmin = opponent = socketsInRoom[1]
@@ -63,7 +64,12 @@ io.on('connection', (socket) => {
   });
 
   socket.on('start', (room, isAdmin) => {
-    var game = new Game();
+    if (!score[room]) {
+      let data = { score: [0, 0], isPlayerFirst: true }
+      var game = new Game(data);
+    } else {
+      var game = new Game(score[room]);
+    }
     handleGenerateDeck(game, room);
     games[room] = game;
     io.to(room).emit('start');
@@ -71,8 +77,16 @@ io.on('connection', (socket) => {
     const roomData = io.sockets.adapter.rooms.get(room);
     if (!roomData) return;
     const socketsInRoom = Array.from(roomData);
-    if (isAdmin) {
+    if (game.isPlayerFirst) {
+      game.playerCardsClickable = true;
+      game.opponentCardsClickable = false;
       io.to(socketsInRoom[0]).emit('playerCardsClickable', true);
+      io.to(socketsInRoom[1]).emit('playerCardsClickable', false);
+    } else {
+      game.playerCardsClickable = false;
+      game.opponentCardsClickable = true;
+      io.to(socketsInRoom[1]).emit('playerCardsClickable', true);
+      io.to(socketsInRoom[0]).emit('playerCardsClickable', false);
     }
     sendCards(games[room]);
   });
@@ -109,13 +123,14 @@ io.on('connection', (socket) => {
     const socketsInRoom = Array.from(roomData);
     const playerType = isAdmin ? game.player : game.opponent;
     const socket = isAdmin ? socketsInRoom[0] : socketsInRoom[1];
-
-    stealTrump(game, playerType, card, socket);
+    console.log(`Player type and socket: ${playerType} and ${socket}`)
+    console.log(`Selected card: ${card} and isAdmin: ${isAdmin}`)
+    stealTrump(game, playerType, card, socket, isAdmin);
 
     games[room] = game;
   });
 
-  socket.on('close', ({ room }) => {
+  socket.on('callEnd', ({ room }) => {
     var game = games[room];
 
     callEnd(game);

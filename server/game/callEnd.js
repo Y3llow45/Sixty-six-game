@@ -10,13 +10,10 @@ function callEnd(game) {
   if (game.playerHands >= 66) {
     let points;
     if (game.opponentHands == 0) {
-      console.log('3 points for player')
       points = 3;
     } else if (game.opponentHands < 33) {
-      console.log('2 points for player')
       points = 2;
     } else {
-      console.log('1 points for player')
       points = 1;
     }
     game.isPlayerFirst = true;
@@ -26,13 +23,10 @@ function callEnd(game) {
   } else {
     let points;
     if (game.playerHands == 0) {
-      console.log('3 points for opponent')
       points = 3;
     } else if (game.opponentHands < 33) {
-      console.log('2 points for opponent')
       points = 2;
     } else {
-      console.log('1 points for opponent')
       points = 1;
     }
     game.isPlayerFirst = false;
@@ -42,6 +36,7 @@ function callEnd(game) {
   }
   game.opponentHands = 0;
   game.playerHands = 0;
+  score[game.room] = { score: game.score, isPlayerFirst: game.isPlayerFirst };
 }
 
 module.exports = callEnd;

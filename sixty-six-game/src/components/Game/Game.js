@@ -9,7 +9,7 @@ const Game = () => {
   const [score, setScore] = useState([0, 0]);
   const [deckLength, setDeckLength] = useState(12);
   const [player, setPlayer] = useState([]);
-  const [trump, setTrump] = useState('trump');
+  const [trump, setTrump] = useState('');
   const [playerHands, setPlayerHands] = useState(0);
   const [opponentSelection, setOpponentSelection] = useState('');
   const [playerSelection, setPlayerSelection] = useState('');
@@ -59,7 +59,7 @@ const Game = () => {
 
   useEffect(() => {
     socket.on('setTrump', (data) => {
-      console.log(data.trump)
+      console.log(`setTrump ${data.trump}`)
       setTrump(data.trump);
       setIsPlaying(true);
     });
@@ -96,6 +96,7 @@ const Game = () => {
       setPlayerSelection('');
       setOpponentSelection('');
       setPlayer([]);
+      setTrump('');
     })
 
     return () => {
@@ -148,7 +149,7 @@ const Game = () => {
 
   const callEnd = () => {
     setIsPlaying(false);
-    socket.emit('callEnd', { room, isAdmin });
+    socket.emit('callEnd', { room });
   }
 
   const setDataFromChild = (room, isAdmin) => {
@@ -170,9 +171,14 @@ const Game = () => {
     setShowRestart(false);
   }
 
+  const logIt = () => {
+    console.log(trump, playerSelection, opponentSelection, deckLength)
+  }
+
   return (
     <div className='game'>
       <Home ref={homeRef} sendDataToParent={setDataFromChild} cleanOnLeave={cleanOnLeave} />
+      <button onClick={() => logIt()}></button>
       <div className='score'>
         <p>You : Opponent</p>
         <p>{isAdmin ? score.join(' - ') : score.slice().reverse().join(' - ')}</p>
