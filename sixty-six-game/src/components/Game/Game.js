@@ -61,6 +61,7 @@ const Game = () => {
     socket.on('setTrump', (data) => {
       console.log(`setTrump ${data.trump}`)
       setTrump(data.trump);
+      setDeckLength(12);
       setIsPlaying(true);
     });
 
@@ -165,14 +166,13 @@ const Game = () => {
 
   const newGame = () => {
     setIsPlaying(true)
-    if (homeRef.current) {
-      homeRef.current.start();
-    }
+    socket.emit('start', room, isAdmin);
+    setDeckLength(12);
     setShowRestart(false);
   }
 
   const logIt = () => {
-    console.log(trump, playerSelection, opponentSelection, deckLength)
+    console.log(trump, playerSelection, opponentSelection, deckLength, playerHands, isPlayerFirst, isClosed, isPlaying, score)
   }
 
   return (
