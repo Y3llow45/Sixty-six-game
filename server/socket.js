@@ -8,6 +8,7 @@ const handleCardClick = require('./game/handleCardClick');
 const compareCards = require('./game/compareCards');
 const sendCards = require('./services/sendCards');
 const stealTrump = require('./game/stealTrump');
+const endClosed = require('./game/endClosed');
 const callEnd = require('./game/callEnd');
 
 const server = require('http').createServer(app);
@@ -63,7 +64,7 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on('start', (room, isAdmin) => {
+  socket.on('start', (room) => {
     if (!score[room]) {
       let data = { score: [0, 0], isPlayerFirst: true }
       var game = new Game(data);
@@ -123,18 +124,43 @@ io.on('connection', (socket) => {
     const socketsInRoom = Array.from(roomData);
     const playerType = isAdmin ? game.player : game.opponent;
     const socket = isAdmin ? socketsInRoom[0] : socketsInRoom[1];
-    console.log(`Player type and socket: ${playerType} and ${socket}`)
-    console.log(`Selected card: ${card} and isAdmin: ${isAdmin}`)
     stealTrump(game, playerType, card, socket, isAdmin);
 
     games[room] = game;
   });
 
-  socket.on('callEnd', ({ room }) => {
+  socket.on('callEnd', ({ room, isAdmin }) => {
+    const roomData = io.sockets.adapter.rooms.get(room);
     var game = games[room];
 
-    callEnd(game);
+    if (!roomData) return;
+    const playerType = isAdmin ? 'player' : 'opponent';
+    game.playerTypeWhoCalled = playerType;
+    console.log(`${playerType} called 66 and game.isClosed=${game.isClosed}`)
+
+    if (game.isClosed) {
+      endClosed(game);
+    } else {
+      callEnd(game, playerType);
+    }
     io.to(room).emit('end', game.score);
+
+    games[room] = game;
+  });
+
+  socket.on('close', ({ room, isAdmin }) => {
+    const roomData = io.sockets.adapter.rooms.get(room);
+    var game = games[room];
+
+    if (!roomData) return;
+
+    const socketsInRoom = Array.from(roomData);
+    const playerType = isAdmin ? 'player' : 'opponent';
+    const socket = isAdmin ? socketsInRoom[1] : socketsInRoom[0];    //the opposite
+    if (!game[`${playerType}CardsClickable`]) return;
+    game.isClosed = true;
+    game.playerTypeWhoClosed = playerType;
+    io.to(socket).emit('close');
 
     games[room] = game;
   });

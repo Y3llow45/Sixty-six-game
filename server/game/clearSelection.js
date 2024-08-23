@@ -1,5 +1,6 @@
 const callEnd = require('./callEnd');
 const sendCards = require('../services/sendCards');
+const endClosed = require('./endClosed');
 
 function clearSelection(option, playerPoints, opponentPoints, game) {
   let removedFromPlayer = game.player.filter(num => num !== game.playerSelection);
@@ -26,7 +27,11 @@ function clearSelection(option, playerPoints, opponentPoints, game) {
   io.to(game.room).emit('deckLength', game.deck.length);
 
   if (player.length == 0 && opponent.length == 0) {
-    callEnd(game);
+    if (game.isClosed) {
+      endClosed(game);
+    } else {
+      callEnd(game);
+    }
     io.to(game.room).emit('end', game.score);
   }
   sendCards(game);

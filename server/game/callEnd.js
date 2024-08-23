@@ -1,6 +1,7 @@
 function callEnd(game) {
-  game.isPlaying = false;
+  console.log(`Points: ${game.playerHands} and ${game.opponentHands}}`)
   game.deck = [];
+  game.isPlaying = false;
   game.opponent = [];
   game.player = [];
   game.trump = '';
@@ -20,7 +21,7 @@ function callEnd(game) {
     game.playerCardsClickable = true;
     game.opponentHandsClickable = false;
     game.score = [game.score[0] + points, game.score[1]];
-  } else {
+  } else if (game.opponentHands >= 66) {
     let points;
     if (game.playerHands == 0) {
       points = 3;
@@ -33,6 +34,18 @@ function callEnd(game) {
     game.playerCardsClickable = false;
     game.opponentHandsClickable = true;
     game.score = [game.score[0], game.score[1] + points]
+  } else {
+    if (game.playerTypeWhoCalled == 'player') {
+      game.isPlayerFirst = false;
+      game.playerCardsClickable = false;
+      game.opponentHandsClickable = true;
+      game.score = [game.score[0], game.score[1] + 2] // wins 2 points because of wrong call
+    } else if (game.playerTypeWhoCalled == 'opponent') {
+      game.isPlayerFirst = true;
+      game.playerCardsClickable = true;
+      game.opponentHandsClickable = false;
+      game.score = [game.score[0] + 2, game.score[1]]; // wins 2 points because of wrong call
+    }
   }
   game.opponentHands = 0;
   game.playerHands = 0;

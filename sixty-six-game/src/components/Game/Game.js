@@ -63,6 +63,7 @@ const Game = () => {
       setTrump(data.trump);
       setDeckLength(12);
       setIsPlaying(true);
+      setIsClosed(false);
     });
 
     socket.on('cards', (data) => {
@@ -100,6 +101,10 @@ const Game = () => {
       setTrump('');
     })
 
+    socket.on('close', () => {
+      setIsClosed(true);
+    });
+
     return () => {
       socket.off('init');
       socket.off('cards');
@@ -108,6 +113,7 @@ const Game = () => {
       socket.off('hands');
       socket.off('deckLength');
       socket.off('end');
+      socket.off('close');
     };
   }, []);
 
@@ -145,12 +151,15 @@ const Game = () => {
 
   const close = () => {
     setIsClosed(true);
+    if (!playerCardsClickable) {
+      return;
+    }
     socket.emit('close', { room, isAdmin });
   }
 
   const callEnd = () => {
     setIsPlaying(false);
-    socket.emit('callEnd', { room });
+    socket.emit('callEnd', { room, isAdmin });
   }
 
   const setDataFromChild = (room, isAdmin) => {
@@ -171,14 +180,9 @@ const Game = () => {
     setShowRestart(false);
   }
 
-  const logIt = () => {
-    console.log(trump, playerSelection, opponentSelection, deckLength, playerHands, isPlayerFirst, isClosed, isPlaying, score)
-  }
-
   return (
     <div className='game'>
       <Home ref={homeRef} sendDataToParent={setDataFromChild} cleanOnLeave={cleanOnLeave} />
-      <button onClick={() => logIt()}></button>
       <div className='score'>
         <p>You : Opponent</p>
         <p>{isAdmin ? score.join(' - ') : score.slice().reverse().join(' - ')}</p>
@@ -192,7 +196,7 @@ const Game = () => {
 
       <div className='center'>
         {isPlaying ?
-          player.length > 0 && deckLength > 1 ?   //change deck.length to decklength
+          player.length > 0 && deckLength > 1 ?
             <img className={isClosed ? 'closed' : 'otherCards'} src={`/cards/back.png`}></img> :
             <img className='otherCards goUnder' src='/cards/empty.png'></img> : null}
         {isPlaying ?

@@ -13,7 +13,9 @@ class Game {
     this.playerCardsClickable = true;  // disable player's card when one card is selected utill cards get compared and put away
     this.opponentCardsClickable = false;
     this.indexOfTrump = 0;
-    this.isPlaying = false
+    this.isPlaying = false;
+    this.playerTypeWhoClosed; // player who closed the deck
+    this.playerTypeWhoCalled; // player who called 66
     this.room;
   }
 }
